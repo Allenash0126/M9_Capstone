@@ -24,10 +24,10 @@ module.exports = {
       image: {
         type: Sequelize.STRING
       },
-      isTeacher: {
+      is_teacher: {
         type: Sequelize.BOOLEAN
       },
-      totalClassTime: {
+      total_class_time: {
         type: Sequelize.INTEGER
       },  
       nation: {

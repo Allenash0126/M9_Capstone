@@ -7,17 +7,16 @@ const userController = {
   }, 
   signUp: (req, res, next) => {    
     const { name, email, password, passwordCheck } = req.body
-    // if (password !== passwordCheck) throw new Error('兩次密碼必須相同')
-    // 另外需再確認該信箱沒有被註冊過
-    return bcrypt.hash(password, 10)
-      .then(hash => User.create({
-        password: hash,
-        name,
-        email
-      }))
+    if (password !== passwordCheck) throw new Error('兩次密碼必須相同')
+    return User.findOne({ where: { email } })
+      .then(user => {
+        if(user) throw new Error('此email已經註冊')
+        return bcrypt.hash(password, 10)
+      })
+      .then(hash => User.create({ password: hash, name, email }))
       .then(() => {
-        // 加入成功通知
-        res.redirect('/signin')
+        req.flash('success_msg','註冊成功！')
+        return res.redirect('/signin')
       })
       .catch(err => next(err))
   },
