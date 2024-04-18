@@ -15,15 +15,23 @@ const userController = {
       })
       .then(hash => User.create({ password: hash, name, email }))
       .then(() => {
-        req.flash('success_msg','註冊成功！')
+        req.flash('success_msg', '註冊成功！')
         return res.redirect('/signin')
       })
       .catch(err => next(err))
   },
   signInPage: (req, res, next) => {   
     return res.render('signin')
+  },
+  signIn: (req, res, next) => {   
+    req.flash('success_msg', '成功登入！')
+    return res.redirect('/classes')    
+  },
+  logout: (req, res, next) => {   
+    req.flash('success_msg', '成功登出！')
+    req.logout()
+    return res.redirect('/signin')        
   }
-  
 }
 
 module.exports = userController
