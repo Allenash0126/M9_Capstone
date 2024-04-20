@@ -14,7 +14,7 @@ app.engine('.hbs', engine({extname: '.hbs', helpers: handlebarsHelpers}))
 app.set('view engine', '.hbs')
 app.set('views', './views')
 // app.use(express.static('public'))
-app.use(express.urlencoded({ extended: true }))
+app.use(express.urlencoded({ extended: true })) // 可在post拿到值 from form
 app.use(session({ secret: SESSION_SECRET, resave: false, saveUninitialized: false }))
 app.use(passport.initialize())
 app.use(passport.session())

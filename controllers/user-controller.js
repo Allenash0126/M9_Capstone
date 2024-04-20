@@ -31,7 +31,19 @@ const userController = {
     req.flash('success_msg', '成功登出！')
     req.logout()
     return res.redirect('/signin')        
-  }
+  },
+  signUpPageTeacher: (req, res, next) => {   
+    return res.render('teacher/signup')
+  },
+  signUpTeacher: (req, res, next) => {   
+    // console.log('I got post teacher')
+    const { intro, style, link, booking } = req.body
+    console.log('intro', intro)
+    console.log('style', style)
+    console.log('link', link)
+    console.log('booking', booking)
+    
+  },  
 }
 
 module.exports = userController

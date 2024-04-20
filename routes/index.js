@@ -9,6 +9,8 @@ const passport = require('passport')
 const { authenticated } = require('../middleware/auth')
 
 router.use('/teacher', teacher)
+router.get('/signup/forteacher', authenticated, userController.signUpPageTeacher)
+router.post('/signup/forteacher', authenticated, userController.signUpTeacher)
 router.get('/signup', userController.signUpPage)
 router.post('/signup', userController.signUp)
 router.get('/signin', userController.signInPage)

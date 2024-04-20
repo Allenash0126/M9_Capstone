@@ -9,11 +9,11 @@
       </button>
       <div class="collapse navbar-collapse" id="navbarCollapse">
         <ul class="navbar-nav ms-auto mb-2 mb-md-0">
-          {{#if user.isTeacher }}
+          {{#unless user.isTeacher }} {{!--  使用unless, 效果：當unless後面為false，才會執行 --}}
           <li class="nav-item">
-            <a href="/teacher" class="nav-link">成為老師</a>
+            <a href="/signup/forteacher" class="nav-link">成為老師</a>
           </li>
-          {{/if}}
+          {{/unless}}
           <li class="nav-item d-inline-flex align-items-center">
             <span class="text-white nav-link">Hi {{ user.name }} !</span>
           </li>
