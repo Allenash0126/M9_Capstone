@@ -10,7 +10,7 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      // define association here
+      Class.belongsTo(models.User, { foreignKey: 'teacherId' })
     }
   }
   Class.init({
@@ -20,9 +20,10 @@ module.exports = (sequelize, DataTypes) => {
     intro: DataTypes.STRING,
     image: DataTypes.STRING,
     scoreAvg: DataTypes.DECIMAL(2, 1),
-    classTime: DataTypes.DATE,
-    classDate: DataTypes.DATE,
-    link: DataTypes.STRING
+    link: DataTypes.STRING,
+    teacherId: DataTypes.INTEGER, 
+    classDuration: DataTypes.BOOLEAN, 
+    classDay: DataTypes.JSON
   }, {
     sequelize,
     modelName: 'Class',

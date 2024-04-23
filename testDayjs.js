@@ -39,7 +39,6 @@ console.log(formattedDate);
 
 
 
-
 // 獲取當前日期
 let currentDate = dayjs();
 
@@ -48,17 +47,16 @@ const dates = [];
 
 // 列出兩週內的日期（14天）
 for (let i = 0; i < 14; i++) {
-  // 檢查是否是星期一或星期三，如果是，則移到下一個可接受的日期
-  while (currentDate.day() === 1 || currentDate.day() === 3) {
-    currentDate = currentDate.add(1, 'day');
-  }
-
-  // 格式化日期，包括星期幾
-  // const formattedDate = currentDate.format('YYYY-MM-DD dddd');
-  const formattedDate = currentDate.format('YYYY-MM-DD');
+  // 檢查是否是星期一、星期二、星期三或星期五，如果是，則加入陣列
+  if (currentDate.day() === 1 || currentDate.day() === 2 || currentDate.day() === 3 || currentDate.day() === 5) {
+    // 格式化日期，包括星期幾
+    const formattedDate = currentDate.format('YYYY-MM-DD dddd');
+    // 格式化日期，不包括星期幾
+    // const formattedDate = currentDate.format('YYYY-MM-DD');
   
-  // 將符合條件的日期加入陣列
-  dates.push(formattedDate);
+    // 將符合條件的日期加入陣列
+    dates.push(formattedDate);
+  }
 
   // 移到下一天
   currentDate = currentDate.add(1, 'day');
@@ -75,15 +73,3 @@ dates.forEach(date => {
 });
 
 console.log('objY 老師可上課的所以日期＋所有時段', objY);
-
-
-
-// 移除 '2024-04-19' 的值 3
-objY['2024-04-19'] = objY['2024-04-19'].filter(value => value !== 3);
-
-// 移除 '2024-04-28' 的值 4
-objY['2024-04-28'] = objY['2024-04-28'].filter(value => value !== 4);
-
-console.log('objY 仍可預約的課程 by 移除已被預約的課程', objY);
-
-console.log(`objY['2024-04-19'] 取出特定日期仍可預約的課程`, objY['2024-04-19']);

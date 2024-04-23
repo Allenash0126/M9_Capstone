@@ -1,13 +1,18 @@
 <div id="container" class="column">
   <form class="form-signup" action="/signup/forteacher" method="post">
     <div id="intro" class="form-row mb-3">
-      <label class="form-label" for="intro">Your Introduction</label>
+      <label class="form-label" for="intro">Introduction</label>
       <input class="form-control" type="text" name="intro" id="intro" placeholder="Text">
     </div>
 
     <div id="style" class="form-row mb-3">
-      <label class="form-label" for="style">Your Teaching Style</label>
+      <label class="form-label" for="style">Teaching Style</label>
       <input class="form-control" type="text" name="style" id="style" placeholder="Text">
+    </div>
+
+    <div id="nation" class="form-row mb-3">
+      <label class="form-label" for="nation">Nation</label>
+      <input class="form-control" type="text" name="nation" id="nation" placeholder="Text">
     </div>
 
     <div id="link" class="form-row mb-3">
@@ -15,39 +20,56 @@
       <input class="form-control" type="text" name="link" id="link" placeholder="Text">
     </div>
 
-    <div id="booking" class="mb-3">
+    <div id="classDuration" class="mb-3">
+      <div class="mb-2">
+        <label>課程長度(分鐘)</label>
+      </div>
+    
+      <div class="d-flex ">
+        <div class="me-3">
+          <input type="checkbox" name="classDuration" id="30" value="0">
+          <label for="30">30</label>
+        </div>
+        <div class="me-3">
+          <input type="checkbox" name="classDuration" id="60" value="1">
+          <label for="60">60</label>
+        </div>
+      </div>
+    </div>
+
+    <div id="classDay" class="mb-3">
       <div class="mb-2">
         <label>開放預約</label>
       </div>
       
       <div class="d-flex ">
         <div class="me-3">
-          <input type="checkbox" name="booking" id="mon" value="1">
-          <label for="mon">Mon</label>
+          <input type="checkbox" name="classDay" id="Monday" value="1">
+          <label for="Monday">Mon</label>
         </div>
         <div class="me-3">
-          <input type="checkbox" name="booking" id="tue" value="2">
-          <label for="tue">Tue</label>
+          <input type="checkbox" name="classDay" id="Tuesday" value="2">
+          <label for="Tuesday">Tue</label>
         </div>
         <div class="me-3">
-          <input type="checkbox" name="booking" id="wed" value="3">
-          <label for="wed">Wed</label>
+          <input type="checkbox" name="classDay" id="Wednesday" value="3">
+          <label for="Wednesday">Wed</label>
         </div>
         <div class="me-3">
-          <input type="checkbox" name="booking" id="thu" value="4">
-          <label for="thu">Thu</label>
+          <input type="checkbox" name="classDay" id="Thursday" value="4">
+          <label for="Thursday">Thu</label>
         </div>
         <div class="me-3">
-          <input type="checkbox" name="booking" id="fri" value="5">
-          <label for="fri">Fri</label>
+          <input type="checkbox" name="classDay" id="Friday" value="5">
+          <label for="Friday">Fri</label>
         </div>
         <div class="me-3">
-          <input type="checkbox" name="booking" id="sat" value="6">
-          <label for="sat">Sat</label>
+          <input type="checkbox" name="classDay" id="Saturday" value="6">
+          <label for="Saturday">Sat</label>
         </div>
         <div class="me-3">
-          <input type="checkbox" name="booking" id="sun" value="7">
-          <label for="sun">Sun</label>
+          <input type="checkbox" name="classDay" id="Sunday" value="7">
+          <label for="Sunday">Sun</label>
         </div>
 
       </div>

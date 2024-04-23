@@ -1,5 +1,5 @@
 const bcrypt = require('bcryptjs')
-const { User } = require('../models')
+const { User, Class } = require('../models')
 
 const userController = {
   signUpPage: (req, res) => {
@@ -36,14 +36,26 @@ const userController = {
     return res.render('teacher/signup')
   },
   signUpTeacher: (req, res, next) => {   
-    // console.log('I got post teacher')
-    const { intro, style, link, booking } = req.body
-    console.log('intro', intro)
-    console.log('style', style)
-    console.log('link', link)
-    console.log('booking', booking)
-    
-  },  
+    const teacherId = req.user.id
+    const { intro, style, link, classDay, classDuration } = req.body
+
+    return Promise.all([
+      User.findByPk(teacherId),
+      Class.findOne({ where: { teacherId } })
+    ])
+      .then(([user, classData]) => {
+        if(!user) throw new Error('There is no such user :(')
+        if(classData) throw new Error('You have been already a teacher')
+        user.update({ isTeacher: 1 })        
+        Class.create({ 
+          intro, style, link, classDay, teacherId, classDuration,
+          teacherName: user.toJSON().name 
+        })
+        req.flash('success_msg', '新增成功')
+        return res.redirect('/teacher/profile')        
+      })
+      .catch(err => next(err))      
+  }
 }
 
 module.exports = userController
