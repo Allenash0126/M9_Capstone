@@ -5,8 +5,8 @@
         style="transition: opacity 0.5s; opacity:0;" onload="this.style.opacity=1">
     </div>
     <div id="teacher intro">
-      <h3>{{ user.name }}</h3>
-      <p>Nation: {{ class.nation }}</p>
+      <h3>{{ record.user.name }}</h3>
+      <p>Nation: {{ class.nation }} </p>
       <p>Score: {{ user.scoreAvg }}</p> {{!-- scoreAvg 從class.model 來  --}}
       <p>About me: {{ class.intro }}</p>
     </div>

@@ -11,16 +11,20 @@
         <div class="collapse navbar-collapse" id="navbarCollapse">
           <ul class="navbar-nav ms-auto mb-2 mb-md-0">
             {{#unless user.isTeacher }} {{!--  使用unless, 效果：當unless後面為false，才會執行 --}}
+              <li class="nav-item d-inline-flex align-items-center">
+                <a href="/users/{{ user.id }}/profile" class="nav-link">{{ user.name }}</a>
+              </li>
+
               <li class="nav-item">
                 <a href="/signup/forteacher" class="nav-link">成為老師</a>
               </li>
             {{/unless}}
 
-            <li class="nav-item d-inline-flex align-items-center">
-              <span class="text-white nav-link">Hi {{ user.name }} !</span>
-            </li>
-
             {{#if user.isTeacher}}
+              <li class="nav-item d-inline-flex align-items-center">
+                <a href="/teacher/profile" class="nav-link">{{ user.name }}</a>
+              </li>
+
               <li class="nav-item">
                 <a href="/teacher/profile"><button class="btn btn-outline-light my-sm-0 my-2">Profile</button></a>
               </li>

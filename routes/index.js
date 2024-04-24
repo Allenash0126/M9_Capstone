@@ -16,6 +16,13 @@ router.post('/signup', userController.signUp)
 router.get('/signin', userController.signInPage)
 router.post('/signin', passport.authenticate('local', { failureRedirect: '/signin', failureFlash: true }), userController.signIn)
 router.get('/logout', userController.logout)
+
+router.get('/users/profile/:id/edit', authenticated, userController.editProfile)
+router.get('/users/:id/profile', authenticated, userController.getProfile)
+router.put('/users/:id/profile', authenticated, userController.putProfile)
+
+router.get('/classes/:id/comment', authenticated, classController.getComment)
+router.post('/classes/:id/comment', authenticated, classController.postComment)
 router.get('/classes', authenticated, classController.getClasses)
 
 router.use('/', (req, res) => res.redirect('/classes'))

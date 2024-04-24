@@ -57,7 +57,37 @@ const userController = {
         return res.redirect('/teacher/profile')        
       })
       .catch(err => next(err))      
-  }
+  },
+  getProfile: (req, res, next) => {
+    const { id } = req.params
+    return Promise.all([
+      User.findByPk(id, { raw: true }),
+      Class.findOne({ where: { teacherId: id }, raw: true })
+    ])
+      .then(([user, classData]) => {
+        res.render('profile', { user, class: classData })
+      })
+      .catch(err => next(err))
+  },
+  editProfile: (req, res, next) => {
+    const { id } = req.params
+    return User.findByPk(id, { raw: true })
+      .then(user => res.render('edit-profile', { user }))
+      .catch(err => next(err))
+  },
+  putProfile: (req, res, next) => {
+    const { id } = req.user
+    const { intro, nation, name } = req.body
+
+    return User.findByPk(id)
+      .then(user => {
+        if(!user) throw new Error('There is no such user :(')
+        user.update({ name, nation, intro })
+        req.flash('success_msg', '更新成功')
+        return res.redirect(`/users/${id}/profile`)        
+      })
+      .catch(err => next(err))         
+  }  
 }
 
 module.exports = userController

@@ -1,11 +1,18 @@
-const { Class } = require('../models')
+const { Class, User } = require('../models')
 
 const classController = {
-  getClasses: (req, res) => {
+  getClasses: (req, res, next) => {
     return res.render('classes')
-  // return Class.findAll()
-  //   .then(classes => res.send({ classes }))
-  //   .catch(err => res.status(422).json(err))    
+  },
+  getComment: (req, res, next) => {
+    const { id } = req.params
+    return User.findByPk(id, { raw: true })
+      .then(user => res.render('comment', { user }))
+      .catch(err => next(err))
+  },
+  postComment: (req, res, next) => {
+    
+    console.log('post it successfully. Wait for DB records')
   }
 }
 
