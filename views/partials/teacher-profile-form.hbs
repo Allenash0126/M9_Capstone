@@ -1,0 +1,87 @@
+<div id="teacherName" class="form-row mb-3">
+  <label class="form-label" for="nation">Name</label>
+  <input class="form-control" type="text" name="teacherName" id="teacherName" placeholder="Text" value="{{ class.teacherName }}">
+</div>
+
+<div id="intro" class="form-row mb-3">
+  <label class="form-label" for="intro">Introduction</label>
+  <input class="form-control" type="text" name="intro" id="intro" placeholder="Text" value="{{ class.intro }}">
+</div>
+
+<div id="style" class="form-row mb-3">
+  <label class="form-label" for="style">Teaching Style</label>
+  <input class="form-control" type="text" name="style" id="style" placeholder="Text" value="{{ class.style }}">
+</div>
+
+<div id="nation" class="form-row mb-3">
+  <label class="form-label" for="nation">Nation</label>
+  <input class="form-control" type="text" name="nation" id="nation" placeholder="Text"  value="{{ class.nation }}">
+</div>
+
+<div id="link" class="form-row mb-3">
+  <label class="form-label" for="link">課程視訊連結</label>
+  <input class="form-control" type="text" name="link" id="link" placeholder="Text" value="{{ class.link }}">
+</div>
+
+<div id="classDuration" class="mb-3">
+  <div class="mb-2">
+    <label>課程長度(分鐘)</label>
+  </div>
+
+  <div class="d-flex ">
+    <div class="me-3">
+      <input type="checkbox" name="classDuration" id="30" value="0" {{#ifCond class.classDuration 0 }} checked {{/ifCond}}>
+      <label for="30">30</label>
+    </div>
+    <div class="me-3">
+      <input type="checkbox" name="classDuration" id="60" value="1" {{#ifCond class.classDuration 1 }} checked {{/ifCond}}>
+      <label for="60">60</label>
+    </div>
+  </div>
+</div>
+
+<div id="classDay" class="mb-3">
+  <div class="mb-2">
+    <label>開放預約</label>
+  </div>
+
+  <div class="d-flex ">
+    <div class="me-3">
+      <input type="checkbox" name="classDay" id="Monday" value="1" {{#includes class.classDay '1'}}checked{{/includes}}>
+      <label for="Monday">Mon</label>
+    </div>
+    <div class="me-3">
+      <input type="checkbox" name="classDay" id="Tuesday" value="2" {{#includes class.classDay '2'}}checked{{/includes}}>
+      <label for="Tuesday">Tue</label>
+    </div>
+    <div class="me-3">
+      <input type="checkbox" name="classDay" id="Wednesday" value="3" {{#includes class.classDay '3'}}checked{{/includes}}>
+      <label for="Wednesday">Wed</label>
+    </div>
+    <div class="me-3">
+      <input type="checkbox" name="classDay" id="Thursday" value="4" {{#includes class.classDay '4'}}checked{{/includes}}>
+      <label for="Thursday">Thu</label>
+    </div>
+    <div class="me-3">
+      <input type="checkbox" name="classDay" id="Friday" value="5" {{#includes class.classDay '5'}}checked{{/includes}}>
+      <label for="Friday">Fri</label>
+    </div>
+    <div class="me-3">
+      <input type="checkbox" name="classDay" id="Saturday" value="6" {{#includes class.classDay '6'}}checked{{/includes}}>
+      <label for="Saturday">Sat</label>
+    </div>
+    <div class="me-3">
+      <input type="checkbox" name="classDay" id="Sunday" value="7" {{#includes class.classDay '7'}}checked{{/includes}}>
+      <label for="Sunday">Sun</label>
+    </div>
+
+  </div>
+</div>
+
+<button class="btn btn-info text-white mb-3" type="submit">Submit</button>
+</form>
+
+<form action="/" method="get">
+  <button class="btn btn-outline-info">Cancel</button>
+</form>
+

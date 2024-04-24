@@ -3,25 +3,34 @@
     <div class="container-fluid">
       <a class="navbar-brand" href="/">Tutor</a>
       {{#if user}}
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse"
-        aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarCollapse">
-        <ul class="navbar-nav ms-auto mb-2 mb-md-0">
-          {{#unless user.isTeacher }} {{!--  使用unless, 效果：當unless後面為false，才會執行 --}}
-          <li class="nav-item">
-            <a href="/signup/forteacher" class="nav-link">成為老師</a>
-          </li>
-          {{/unless}}
-          <li class="nav-item d-inline-flex align-items-center">
-            <span class="text-white nav-link">Hi {{ user.name }} !</span>
-          </li>
-          <li class="nav-item">
-            <a href="/logout"><button class="btn btn-outline-light my-sm-0 my-2">Logout</button></a>
-          </li>
-        </ul>
-      </div>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse"
+          aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+          <ul class="navbar-nav ms-auto mb-2 mb-md-0">
+            {{#unless user.isTeacher }} {{!--  使用unless, 效果：當unless後面為false，才會執行 --}}
+              <li class="nav-item">
+                <a href="/signup/forteacher" class="nav-link">成為老師</a>
+              </li>
+            {{/unless}}
+
+            <li class="nav-item d-inline-flex align-items-center">
+              <span class="text-white nav-link">Hi {{ user.name }} !</span>
+            </li>
+
+            {{#if user.isTeacher}}
+              <li class="nav-item">
+                <a href="/teacher/profile"><button class="btn btn-outline-light my-sm-0 my-2">Profile</button></a>
+              </li>
+            {{/if}}
+            
+            <li class="nav-item">
+              <a href="/logout"><button class="btn btn-outline-light my-sm-0 my-2">Logout</button></a>
+            </li>
+          </ul>
+        </div>
       {{/if}}
     </div>
   </nav>

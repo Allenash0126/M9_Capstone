@@ -33,11 +33,13 @@ const userController = {
     return res.redirect('/signin')        
   },
   signUpPageTeacher: (req, res, next) => {   
-    return res.render('teacher/signup')
+    const classData = {}
+    classData.classDay = 'no data yet' // 為了避免在 handlebar-helpers 的 indexOf 讀不到值而出現錯誤，所以先給空值
+    return res.render('teacher/signup', { class: classData })
   },
   signUpTeacher: (req, res, next) => {   
     const teacherId = req.user.id
-    const { intro, style, link, classDay, classDuration } = req.body
+    const { intro, style, link, classDay, classDuration, nation } = req.body
 
     return Promise.all([
       User.findByPk(teacherId),
@@ -48,7 +50,7 @@ const userController = {
         if(classData) throw new Error('You have been already a teacher')
         user.update({ isTeacher: 1 })        
         Class.create({ 
-          intro, style, link, classDay, teacherId, classDuration,
+          intro, style, link, classDay, teacherId, classDuration, nation,
           teacherName: user.toJSON().name 
         })
         req.flash('success_msg', '新增成功')
