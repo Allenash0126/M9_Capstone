@@ -1,6 +1,7 @@
 const express = require('express')
 const router = express.Router()
 
+const upload = require('../middleware/multer')
 const classController = require('../controllers/class-controller')
 const userController = require('../controllers/user-controller')
 const { generalErrorHandler } = require('../middleware/error-handler')
@@ -10,7 +11,7 @@ const { authenticated } = require('../middleware/auth')
 
 router.use('/teacher', teacher)
 router.get('/signup/forteacher', authenticated, userController.signUpPageTeacher)
-router.post('/signup/forteacher', authenticated, userController.signUpTeacher)
+router.post('/signup/forteacher', upload.single('image'), authenticated, userController.signUpTeacher)
 router.get('/signup', userController.signUpPage)
 router.post('/signup', userController.signUp)
 router.get('/signin', userController.signInPage)

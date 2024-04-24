@@ -18,6 +18,11 @@
   <input class="form-control" type="text" name="nation" id="nation" placeholder="Text"  value="{{ class.nation }}">
 </div>
 
+<div class="form-row mb-3">
+  <label class="form-label" for="image">Image</label>
+  <input class="form-control" class="form-control-file" type="file" name="image" id="image">
+</div>
+
 <div id="link" class="form-row mb-3">
   <label class="form-label" for="link">課程視訊連結</label>
   <input class="form-control" type="text" name="link" id="link" placeholder="Text" value="{{ class.link }}">
@@ -81,7 +86,8 @@
 <button class="btn btn-info text-white mb-3" type="submit">Submit</button>
 </form>
 
-<form action="/" method="get">
+{{!-- <form action="/" method="get">
   <button class="btn btn-outline-info">Cancel</button>
-</form>
+</form> --}}
+<a class="btn btn-outline-info" href="javascript:history.back()">Back</a>
 

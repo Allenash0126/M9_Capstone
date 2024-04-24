@@ -1,4 +1,5 @@
 const { User, Class } = require('../models')
+const { localFileHandler } = require('../helpers/file-helpers')
 
 const teacherController = {
   getProfile: (req, res, next) => {
@@ -32,16 +33,23 @@ const teacherController = {
   putProfile: (req, res, next) => {
     const teacherId = req.user.id
     const { intro, style, link, classDay, classDuration, nation, teacherName } = req.body
+    const { file } = req
 
     return Promise.all([
       User.findByPk(teacherId),
-      Class.findOne({ where: { teacherId } })
+      Class.findOne({ where: { teacherId } }),
+      localFileHandler(file)
     ])
-      .then(([user, classData]) => {
+      .then(([user, classData, filePath]) => {
         if(!user) throw new Error('There is no such user :(')
         if(!classData) throw new Error('You are not a teacher now. Please sign up for 成為老師') 
-        classData.update({ intro, style, link, classDay, teacherId, classDuration, nation, teacherName })
-        user.update({ name: teacherName, nation, intro })
+        classData.update({ intro, style, link, classDay, teacherId, classDuration, nation, teacherName, image: filePath || classData.image })
+        user.update({ 
+          name: teacherName, 
+          image: filePath || classData.image,
+          nation, 
+          intro 
+        })
         req.flash('success_msg', '更新成功')
         return res.redirect('/teacher/profile')        
       })

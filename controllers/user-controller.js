@@ -1,5 +1,6 @@
 const bcrypt = require('bcryptjs')
 const { User, Class } = require('../models')
+const { localFileHandler } = require('../helpers/file-helpers')
 
 const userController = {
   signUpPage: (req, res) => {
@@ -40,18 +41,26 @@ const userController = {
   signUpTeacher: (req, res, next) => {   
     const teacherId = req.user.id
     const { intro, style, link, classDay, classDuration, nation } = req.body
+    const { file } = req
 
     return Promise.all([
       User.findByPk(teacherId),
-      Class.findOne({ where: { teacherId } })
+      Class.findOne({ where: { teacherId } }),
+      localFileHandler(file)
     ])
-      .then(([user, classData]) => {
+      .then(([user, classData, filePath]) => {
         if(!user) throw new Error('There is no such user :(')
         if(classData) throw new Error('You have been already a teacher')
-        user.update({ isTeacher: 1 })        
+        user.update({ 
+          isTeacher: 1,
+          image: filePath || null, 
+          intro,
+          nation
+        })        
         Class.create({ 
           intro, style, link, classDay, teacherId, classDuration, nation,
-          teacherName: user.toJSON().name 
+          teacherName: user.toJSON().name,
+          image: filePath || null
         })
         req.flash('success_msg', '新增成功')
         return res.redirect('/teacher/profile')        
