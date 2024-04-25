@@ -8,6 +8,16 @@ const classController = {
       .then(classes => res.render('classes', { classes }))
       .catch(err => next(err))
   },
+  getClass: (req, res, next) => {
+    const { id } = req.params
+    return Class.findByPk(id, {
+      raw: true
+    })
+      .then(classData => {
+        res.render('class', { class: classData }
+      )})
+      .catch(err => next(err))
+  },  
   getComment: (req, res, next) => {
     const { id } = req.params
     return User.findByPk(id, { raw: true })

@@ -24,6 +24,8 @@ router.put('/users/:id/profile', upload.single('image'), authenticated, userCont
 
 router.get('/classes/:id/comment', authenticated, classController.getComment)
 router.post('/classes/:id/comment', authenticated, classController.postComment)
+
+router.get('/classes/:id', authenticated, classController.getClass)
 router.get('/classes', authenticated, classController.getClasses)
 
 router.use('/', (req, res) => res.redirect('/classes'))
