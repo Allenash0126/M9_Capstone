@@ -2,7 +2,11 @@ const { Class, User } = require('../models')
 
 const classController = {
   getClasses: (req, res, next) => {
-    return res.render('classes')
+    return Class.findAll({
+      raw: true
+    })
+      .then(classes => res.render('classes', { classes }))
+      .catch(err => next(err))
   },
   getComment: (req, res, next) => {
     const { id } = req.params
