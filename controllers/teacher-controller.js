@@ -43,12 +43,14 @@ const teacherController = {
       .then(([user, classData, filePath]) => {
         if(!user) throw new Error('There is no such user :(')
         if(!classData) throw new Error('You are not a teacher now. Please sign up for 成為老師') 
-        classData.update({ intro, style, link, classDay, teacherId, classDuration, nation, teacherName, image: filePath || classData.image })
+        classData.update({ 
+          intro, style, link, classDay, teacherId, classDuration, nation, teacherName, 
+          image: filePath || classData.image 
+        })
         user.update({ 
+          nation, intro,           
           name: teacherName, 
-          image: filePath || classData.image,
-          nation, 
-          intro 
+          image: filePath || classData.image
         })
         req.flash('success_msg', '更新成功')
         return res.redirect('/teacher/profile')        

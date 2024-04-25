@@ -1,9 +1,10 @@
 <div id="container" class="d-flex">
   <div id="left" class="col-4">
-    <div id="studentImage">
-      <img class="img-fluid" src="{{user.image}}" alt="card image" width="286px" height="180px"
-        style="transition: opacity 0.5s; opacity:0;" onload="this.style.opacity=1">
+    <div id="image">
+      <img class="image-resposive center-block" src="{{ user.image }}" alt="card image"
+        style="width:250px; margin-bottom: 25px; transition: opacity 0.5s; opacity:0;" onload="this.style.opacity=1">
     </div>
+    
     <div id="intro">
       <h3>{{ user.name }}</h3>
       <p>Nation: {{ user.nation }}</p>

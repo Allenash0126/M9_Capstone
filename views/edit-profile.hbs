@@ -1,5 +1,5 @@
 <div id="container" class="column">
-  <form class="" action="/users/{{ user.id }}/profile?_method=PUT" method="post">
+  <form class="" action="/users/{{ user.id }}/profile?_method=PUT" method="post" enctype="multipart/form-data">
     <div id="name" class="form-row mb-3">
       <label class="form-label" for="nation">Name</label>
       <input class="form-control" type="text" name="name" id="name" placeholder="Text"
@@ -15,12 +15,18 @@
       <label class="form-label" for="nation">Nation</label>
       <input class="form-control" type="text" name="nation" id="nation" placeholder="Text" value="{{ user.nation }}">
     </div>
+
+    <div class="form-row mb-3">
+      <label class="form-label" for="image">Image</label>
+      <input class="form-control" class="form-control-file" type="file" name="image" id="image">
+    </div>
     
     <button class="btn btn-info text-white mb-3" type="submit">Submit</button>
   </form>
     
-  <form action="/" method="get">
+  {{!-- <form action="/" method="get">
     <button class="btn btn-outline-info">Cancel</button>
-  </form>
+  </form> --}}
+  <a class="btn btn-outline-info" href="javascript:history.back()">Back</a>
 
 </div>

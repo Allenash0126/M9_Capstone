@@ -20,7 +20,7 @@ router.get('/logout', userController.logout)
 
 router.get('/users/profile/:id/edit', authenticated, userController.editProfile)
 router.get('/users/:id/profile', authenticated, userController.getProfile)
-router.put('/users/:id/profile', authenticated, userController.putProfile)
+router.put('/users/:id/profile', upload.single('image'), authenticated, userController.putProfile)
 
 router.get('/classes/:id/comment', authenticated, classController.getComment)
 router.post('/classes/:id/comment', authenticated, classController.postComment)

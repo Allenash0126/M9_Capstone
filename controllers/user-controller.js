@@ -87,11 +87,18 @@ const userController = {
   putProfile: (req, res, next) => {
     const { id } = req.user
     const { intro, nation, name } = req.body
+    const { file } = req
 
-    return User.findByPk(id)
-      .then(user => {
-        if(!user) throw new Error('There is no such user :(')
-        user.update({ name, nation, intro })
+    return Promise.all([
+      User.findByPk(id),
+      localFileHandler(file)
+    ])
+      .then(([user, filePath]) => {
+        if(!user) throw new Error('There is no such user :(')   
+        user.update({ 
+          name, nation, intro,
+          image: filePath || user.image
+        })
         req.flash('success_msg', '更新成功')
         return res.redirect(`/users/${id}/profile`)        
       })
