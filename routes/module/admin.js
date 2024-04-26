@@ -2,8 +2,11 @@ const express = require('express')
 const router = express.Router()
 const adminController = require('../../controllers/admin-controller')
 
-router.get('/timelist', adminController.getTimeList)
-
-router.use('/', (req, res) => res.redirect('/admin/timelist'))
+router.get('/timelists/:id', adminController.getTimeLists)
+router.get('/timelists', adminController.getTimeLists) // 上面兩者 adminController都是 getTimeLists, 差別在路由是否有 id
+router.post('/timelists', adminController.postTimeList)
+router.put('/timelists/:id', adminController.putTimeList)
+router.delete('/timelists/:id', adminController.deleteTimeList)
+router.use('/', (req, res) => res.redirect('/admin/timelists'))
 
 module.exports = router

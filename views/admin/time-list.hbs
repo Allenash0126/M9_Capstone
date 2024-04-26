@@ -1,18 +1,18 @@
 <div class="d-flex align-items-center pt-3 pb-5 my-3 text-white-50 bg-purple">
-  {{#if category}}
-  <form action="/admin/categories/{{category.id}}?_method=PUT" method="post" class="row">
+  {{#if list}}
+  <form action="/admin/timelists/{{ list.id }}?_method=PUT" method="post" class="row">
     <div class="col-auto">
-      <input class="form-control" type="text" name="name" id="name" value="{{category.name}}">
+      <input class="form-control" type="text" name="timeList" id="timeList" value="{{ list.timeList }}">
     </div>
     <div class="col-auto">
-      <button class="btn btn-warning" type="submit">Create</button>
-      <a href="/admin/categories">or Create new</a>
+      <button class="btn btn-warning" type="submit">Update</button>
+      <a href="/admin/timelists">or Create new</a>
     </div>
   </form>
   {{else}}
-  <form action="/admin/categories" method="post" class="row">
+  <form action="/admin/timelists" method="post" class="row">
     <div class="col-auto">
-      <input class="form-control" type="text" name="name" id="name" placeholder="Category Name">
+      <input class="form-control" type="text" name="timeList" id="timeList" placeholder="Class Duration">
     </div>
     <div class="col-auto">
       <button class="btn btn-success" type="submit">Creat</button>
@@ -36,11 +36,11 @@
       <td>{{this.timeList}}</td>
       <td>
         <button type="button" class="btn btn-link">
-          <a class="btn btn-link link-primary" href="/admin/categories/{{this.id}}">
+          <a class="btn btn-link link-primary" href="/admin/timelists/{{this.id}}">
             Edit
           </a>
         </button>
-        <form action="/admin/categories/{{this.id}}?_method=DELETE" method="POST" style="display: inline;">
+        <form action="/admin/timelists/{{this.id}}?_method=DELETE" method="POST" style="display: inline;">
           <button type="submit" class="btn btn-link link-danger"
             onclick="return confirm(`確定要刪除{{this.timeList}}嗎？`)">Delete</button>
         </form>
