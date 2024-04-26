@@ -25,6 +25,7 @@ const userController = {
     return res.render('signin')
   },
   signIn: (req, res, next) => {   
+    if (req.user.email === 'root@example.com') return res.redirect('/admin/timelist')
     req.flash('success_msg', '成功登入！')
     return res.redirect('/classes')    
   },
