@@ -12,17 +12,19 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       Record.belongsTo(models.User, { foreignKey: 'teacherId' }),
       Record.belongsTo(models.User, { foreignKey: 'studentId' }),
-      Record.belongsTo(models.List, { foreignKey: 'timeListId' })
+      Record.belongsTo(models.List, { foreignKey: 'timeListId' }),
+      Record.belongsTo(models.Class, { foreignKey: 'classId' })
     }
   }
   Record.init({
     teacherId: DataTypes.INTEGER,
     studentId: DataTypes.INTEGER,
-    listId: DataTypes.INTEGER,
+    timeListId: DataTypes.INTEGER,
     score: DataTypes.INTEGER,    
     comment: DataTypes.STRING,
-    classDate: DataTypes.STRING,
-    classDuration: DataTypes.INTEGER
+    date: DataTypes.STRING,
+    oclock: DataTypes.STRING,
+    classId: DataTypes.INTEGER
   }, {
     sequelize,
     modelName: 'Record',

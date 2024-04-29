@@ -2,7 +2,7 @@
   {{#if list}}
   <form action="/admin/timelists/{{ list.id }}?_method=PUT" method="post" class="row">
     <div class="col-auto">
-      <input class="form-control" type="text" name="timeList" id="timeList" value="{{ list.timeList }}">
+      <input class="form-control" type="text" name="oclock" id="oclock" value="{{ list.oclock }}">
     </div>
     <div class="col-auto">
       <button class="btn btn-warning" type="submit">Update</button>
@@ -12,7 +12,7 @@
   {{else}}
   <form action="/admin/timelists" method="post" class="row">
     <div class="col-auto">
-      <input class="form-control" type="text" name="timeList" id="timeList" placeholder="Class Duration">
+      <input class="form-control" type="text" name="oclock" id="oclock" placeholder="Class Duration">
     </div>
     <div class="col-auto">
       <button class="btn btn-success" type="submit">Creat</button>
@@ -33,7 +33,7 @@
     {{#each lists}}
     <tr>
       <th scope="row">{{this.id}}</th>
-      <td>{{this.timeList}}</td>
+      <td>{{this.oclock}}</td>
       <td>
         <button type="button" class="btn btn-link">
           <a class="btn btn-link link-primary" href="/admin/timelists/{{this.id}}">
@@ -42,7 +42,7 @@
         </button>
         <form action="/admin/timelists/{{this.id}}?_method=DELETE" method="POST" style="display: inline;">
           <button type="submit" class="btn btn-link link-danger"
-            onclick="return confirm(`確定要刪除{{this.timeList}}嗎？`)">Delete</button>
+            onclick="return confirm(`確定要刪除{{this.oclock}}嗎？`)">Delete</button>
         </form>
       </td>
     </tr>

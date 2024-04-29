@@ -1,5 +1,6 @@
 const bcrypt = require('bcryptjs')
-const { User, Class } = require('../models')
+const dayjs = require('dayjs');
+const { User, Class, List, Record } = require('../models')
 const { localFileHandler } = require('../helpers/file-helpers')
 
 const userController = {
@@ -41,17 +42,32 @@ const userController = {
   },
   signUpTeacher: (req, res, next) => {   
     const teacherId = req.user.id
-    const { intro, style, link, classDay, classDuration, nation } = req.body
+    const { intro, style, link, classDay, duration30or60, nation } = req.body
     const { file } = req
+
+    // 老師可以上課的所有日期 dates
+    const dates = [] 
+    let currentDate = dayjs() // 獲取當前日期
+    for (let i = 0; i < 14; i++) {
+      if (classDay.some(day => parseInt(day) === currentDate.day())) {
+        const formattedDate = currentDate.format('YYYY-MM-DD dddd')
+        dates.push(formattedDate);
+      }
+      currentDate = currentDate.add(1, 'day')
+    }  
 
     return Promise.all([
       User.findByPk(teacherId),
       Class.findOne({ where: { teacherId } }),
-      localFileHandler(file)
+      localFileHandler(file),
+      List.findAll({ where: { duration30or60 }, raw: true }),
+      Class.findAll({ raw: true })
     ])
-      .then(([user, classData, filePath]) => {
+      .then(([user, classData, filePath, lists, classesDatas]) => {
         if(!user) throw new Error('There is no such user :(')
         if(classData) throw new Error('You have been already a teacher')
+        const classNumberInOneDay = lists.length // 每天可約的時段數量有幾個
+        
         user.update({ 
           isTeacher: 1,
           image: filePath || null, 
@@ -59,12 +75,28 @@ const userController = {
           nation
         })        
         Class.create({ 
-          intro, style, link, classDay, teacherId, classDuration, nation,
+          intro, style, link, classDay, teacherId, duration30or60, nation,
           teacherName: user.toJSON().name,
           image: filePath || null
         })
-        req.flash('success_msg', '新增成功')
-        return res.redirect('/teacher/profile')        
+
+        for (let i = 0; i < classDay.length; i++ ) {
+          for (let j = 0; j < classNumberInOneDay; j++ ) {
+            let chosenOclock = lists.filter(list => list.oclock === lists[j].oclock)
+            let timeListId = chosenOclock[0].id            
+            Record.create({
+              teacherId,
+              timeListId,
+              date: dates[i],
+              oclock: lists[j].oclock,
+              classId: classesDatas.length + 1
+            })
+          }
+        }   
+      })
+      .then(() => {
+        req.flash('success_msg', '歡迎成為老師！')
+        return res.redirect('/teacher/profile')      
       })
       .catch(err => next(err))      
   },

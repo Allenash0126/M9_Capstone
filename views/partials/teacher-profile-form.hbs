@@ -28,18 +28,18 @@
   <input class="form-control" type="text" name="link" id="link" placeholder="Text" value="{{ class.link }}">
 </div>
 
-<div id="classDuration" class="mb-3">
+<div id="duration30or60" class="mb-3">
   <div class="mb-2">
     <label>課程長度(分鐘)</label>
   </div>
 
   <div class="d-flex ">
     <div class="me-3">
-      <input type="checkbox" name="classDuration" id="30" value="0" {{#ifCond class.classDuration 0 }} checked {{/ifCond}}>
+      <input type="checkbox" name="duration30or60" id="30" value="0" {{#ifCond class.duration30or60 0 }} checked {{/ifCond}}>
       <label for="30">30</label>
     </div>
     <div class="me-3">
-      <input type="checkbox" name="classDuration" id="60" value="1" {{#ifCond class.classDuration 1 }} checked {{/ifCond}}>
+      <input type="checkbox" name="duration30or60" id="60" value="1" {{#ifCond class.duration30or60 1 }} checked {{/ifCond}}>
       <label for="60">60</label>
     </div>
   </div>
@@ -76,7 +76,7 @@
       <label for="Saturday">Sat</label>
     </div>
     <div class="me-3">
-      <input type="checkbox" name="classDay" id="Sunday" value="7" {{#includes class.classDay '7'}}checked{{/includes}}>
+      <input type="checkbox" name="classDay" id="Sunday" value="0" {{#includes class.classDay '0'}}checked{{/includes}}>
       <label for="Sunday">Sun</label>
     </div>
 

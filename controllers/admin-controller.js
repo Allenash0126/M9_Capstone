@@ -13,12 +13,12 @@ const adminController = {
       })
   },
   postTimeList: (req, res, next) => {
-    const { timeList } = req.body
-    if (!timeList) throw new Error('Creating nothing is forbidden.')
-    return List.findOne({ where: { timeList } })
+    const { oclock } = req.body
+    if (!oclock) throw new Error('Creating nothing is forbidden.')
+    return List.findOne({ where: { oclock } })
       .then(list => {
         if(list) throw new Error('It has already been in list')
-        return List.create({ timeList })
+        return List.create({ oclock })
       })
       .then(() => {
         req.flash('success_msg', '新增成功！')
@@ -28,13 +28,13 @@ const adminController = {
   },
   putTimeList: (req, res, next) => {
     const { id } = req.params
-    const { timeList } = req.body
+    const { oclock } = req.body
 
-    if (!timeList) throw new Error('Updating nothing is forbidden.')    
+    if (!oclock) throw new Error('Updating nothing is forbidden.')    
     return List.findByPk(id)
       .then(list => {
-        if(list.timeList === timeList) throw new Error('You updated nothing : (')
-        return list.update({ timeList })
+        if(list.oclock === oclock) throw new Error('You updated nothing : (')
+        return list.update({ oclock })
       })
       .then(() => {
         req.flash('success_msg', '更新成功！')

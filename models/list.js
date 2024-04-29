@@ -14,7 +14,8 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   List.init({
-    timeList: DataTypes.STRING
+    oclock: DataTypes.STRING,
+    duration30or60: DataTypes.BOOLEAN
   }, {
     sequelize,
     modelName: 'List',
