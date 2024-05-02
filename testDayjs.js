@@ -88,3 +88,64 @@ for(i = 0; i < dates.length; i++) {
 }
 
 console.log('newArr 分別紀錄老師可上課的日期＋時段', newArr);
+
+
+
+
+currentDate = dayjs(); // 取得當前日期
+
+let a = ['2024-04-29', '2024-04-30', '2024-05-01', '2024-05-02'];
+const oldDates = [ '2024-04-29 Monday', '2024-05-02 Thursday' ]
+
+let beforeCurrentDate = []; // 存放當前日期之前的日期的陣列
+let afterCurrentDate = []; // 存放當前日期之後的日期的陣列
+
+// 遍歷陣列中的每個日期
+oldDates.forEach(date => {
+  const [dateString, dayOfWeek] = date.split(' '); // 將日期與星期分開
+  let dateObj = dayjs(dateString); // 將字串日期轉換為 Day.js 物件
+  const formattedDate = `${dateString} ${dayOfWeek}`; // 保留星期幾的資訊
+  if (dateObj.isBefore(currentDate)) {
+    beforeCurrentDate.push(formattedDate); // 將當前日期之前的日期添加到 beforeCurrentDate 陣列中
+  } else {
+    afterCurrentDate.push(formattedDate); // 將當前日期之後的日期添加到 afterCurrentDate 陣列中
+  }
+});
+
+console.log('當前日期之前的日期：', beforeCurrentDate);
+console.log('當前日期之後的日期：', afterCurrentDate);
+
+const exam1 = '0'
+const exam2 = '1'
+
+console.log('!exam1', !parseInt(exam1))
+console.log('!exam2', !parseInt(exam2))
+
+
+const arr1 = [{
+  name: 'allen',
+  age: '11'
+}, {
+  name: 'bob',
+  age: '33'
+}]
+const arr2 = [{
+  name: 'candy',
+  age: '14'
+}, {
+  name: 'denny',
+  age: '40'
+}]
+
+const g1 = []
+g1.push(arr1, arr2)
+console.log('g1', g1)
+
+const g2 = []
+g2.push(arr1)
+g2.push(arr2)
+console.log('g2', g2)
+
+const g3 = []
+g3.push(...arr1, ...arr2)
+console.log('g3', g3)

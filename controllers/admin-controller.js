@@ -44,11 +44,17 @@ const adminController = {
   },
   deleteTimeList: (req, res, next) => {
     const { id } = req.params
-    return List.findByPk(id)
-      .then(list => {
-        if(!list) throw new Error('There is no such list : (')
-        return list.destroy()
-      })    
+    return List.findAll({ where: { oclock: 'test for records 1' } })
+      .then(lists => {
+        console.log('lists~~~~', lists)
+        // return lists.destroy()
+        return lists.forEach(list => list.destroy()) 
+      })
+    // return List.findByPk(id)
+    //   .then(list => {
+    //     if(!list) throw new Error('There is no such list : (')
+    //     return list.destroy()
+    //   })    
       .then(() => {
         req.flash('success_msg', '刪除成功！')
         return res.redirect('/admin')

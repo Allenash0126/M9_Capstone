@@ -2,6 +2,7 @@ const bcrypt = require('bcryptjs')
 const dayjs = require('dayjs');
 const { User, Class, List, Record } = require('../models')
 const { localFileHandler } = require('../helpers/file-helpers')
+const { recordCreator } = require('../helpers/record-helpers')
 
 const userController = {
   signUpPage: (req, res) => {
@@ -80,7 +81,8 @@ const userController = {
           image: filePath || null
         })
 
-        for (let i = 0; i < classDay.length; i++ ) {
+        // recordCreator(req)
+        for (let i = 0; i < dates.length; i++ ) {
           for (let j = 0; j < classNumberInOneDay; j++ ) {
             let chosenOclock = lists.filter(list => list.oclock === lists[j].oclock)
             let timeListId = chosenOclock[0].id            
