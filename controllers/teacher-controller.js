@@ -49,8 +49,7 @@ const teacherController = {
       }
       currentDate = currentDate.add(1, 'day')
     }  
-    currentDate = dayjs() // 把 currentDate調整回今天的日期
-    console.log('新的可以被預約的 newDates~~~~~~', newDates)
+    currentDate = dayjs() // 把 currentDate 調整回今天的日期
 
     return Promise.all([
       User.findByPk(req.user.id),
@@ -73,17 +72,16 @@ const teacherController = {
           name: teacherName, 
           image: filePath || classData.image
         })    
-    // return Record.findAll({ where: { classId } })
-    //   .then(records => {
 
-        // 取得 records 內已儲存的 date 於 oldDates
+        // 以下針對 Records 來撰寫
+        // 首先取得 records 內已儲存的 date, 存放於 oldDates
         const oldDatesDuplicated = records.map(record => record.date) // 內含多組重複的日期
         const oldDates = Array.from(new Set(oldDatesDuplicated)) // Set可移除重複data 且為Obj, 須再轉為Arr
         
-        const oldDatesBnow = []; // 存放當前日期之前的日期的陣列
-        const oldDatesAnow = []; // 存放當前日期之後的日期的陣列
-
-        // 遍歷陣列中的每個日期
+        // 為了區分 已存在於 DB 的日期, 是比今天更早、或更晚
+        // 命名說明: 若有 dates開頭, 表示該陣列為日期陣列
+        const oldDatesBnow = []; // 「早」於今天的日期陣列, 命名說明 Bnow = Before Now, 
+        const oldDatesAnow = []; // 「晚」於今天的日期陣列, 命名說明 Anow = After Now
         oldDates.forEach(oldDate => {
           const [dateString, dayOfWeek] = oldDate.split(' ')
           const dateObj = dayjs(dateString) // 將字串轉成物件 讓外掛 dayjs 可以幫忙處理 isBefore & isAfter
@@ -94,27 +92,24 @@ const teacherController = {
             oldDatesAnow.push(formattedDate)
           }
         })
-
-        console.log('oldDates: ', oldDates)
-        console.log('oldDatesBnow: 在舊的data中, 是當前日期之「前」的日期 oldDatesBnow: ', oldDatesBnow)
-        console.log('oldDatesAnow: 在舊的data中, 是當前日期之「後」的日期 oldDatesAnow: ', oldDatesAnow)
         
+        // 將對應的完整data放入陣列
+        // 命名說明: 若有 records 開頭, 表示該陣列為raw data, 且為非raw: true 的格式, 便於後續直接對 DB 操作
         const recordsBnow = records.filter(record => oldDatesBnow.includes(record.date))
         const recordsAnow = records.filter(record => oldDatesAnow.includes(record.date))
-        console.log('recordsBnow: 在舊的data中, 是當前日期之「前」的日期的raw data: ', recordsBnow)
-        console.log('recordsAnow: 在舊的data中, 是當前日期之「後」的日期的raw data: ', recordsAnow)
 
+        // 區分對應的data 是否學生已經上課過, 老師是否已經教學過 taught
         const recordsBnowTaught = recordsBnow.filter(data => data.studentId)
-        const recordsBnowNonTaught = recordsBnow.filter(data => !data.studentId)
-        console.log('recordsBnowTaught: 在舊的data中, 用filter方法: 篩出「有」studentId 的 raw data', recordsBnowTaught)
-        console.log('recordsBnowNonTaught: 在舊的data中, 用filter方法: 篩出「無」studentId 的 raw data', recordsBnowNonTaught)              
+        const recordsBnowNonTaught = recordsBnow.filter(data => !data.studentId)  
 
-        // 2號：仍須確認
+        // 找出過往的課程 是否碰巧也符合 現在所選擇的課程
         const recordsAnowFitNewDates = recordsAnow.filter(record => newDates.includes(record.date))
+
+        // 若過往課程 剛好也符合現在所選課程, 進一步確認是否有更改 duration (30 or 60)
+        // 命名說明: 若符合 duration, 則結尾為 FitDuration; 若不符合, 則結尾為 AntiDuration
         const recordsAnowFitDuration = []
         const recordsAnowAntiDuration = []
         recordsAnowFitNewDates.forEach(data => {
-          // 確認這次更新 user是否選到跟DB同樣的 duration30or60
           const durationFromDB = parseInt(duration30or60)
           const durationFromBrowser = data.oclock.includes(':30')
           if ((durationFromDB && !durationFromBrowser) || (!durationFromDB && durationFromBrowser)) {
@@ -124,37 +119,30 @@ const teacherController = {
           }
         })
         
-        // 3號：準備delete的組別
+        // 舊data中, 篩出跟newDates不同的data, 後續將 delete
         const recordsAnowAntiNewDates = recordsAnow.filter(record => !newDates.includes(record.date)) 
-        // 45號：準備create的組別
+        // 新dates中, 篩出舊data沒有的日期, 後續將 create
         const newDatesAntiRecords = newDates.filter(newDate => !oldDates.includes(newDate)) 
-        console.log('recordsAnowFitNewDates: 取出2號: 在未來 被包含在新data的舊data', recordsAnowFitNewDates)
-        console.log('recordsAnowFitDuration: 取出2號: 在未來 被包含在新data的舊data 與本次更新有「同樣」的duration30or60', recordsAnowFitDuration)
-        console.log('recordsAnowAntiDuration: 取出2號: 在未來 被包含在新data的舊data 與本次更新有「不同」的duration30or60', recordsAnowAntiDuration)
-        console.log('recordsAnowAntiNewDates: 取出3號: 在未來 不被包含在新data的舊data', recordsAnowAntiNewDates)
-        console.log('newDatesAntiRecords: 取出4+5號:在未來 不包含舊data的新data', newDatesAntiRecords)
-        
+
+        // 把三種行為的群組 各自分組集合 ex: Save, Destroy, Create
+        // 命名說明: g 表示 Group                 
         const g1RecordsSave = []
         const g2RecordsDestroy = []
         const g3DatesCreate = []
-        const newDatesAntiDuration = recordsAnowAntiDuration.map(record => record.date) // 
-
-        // 把三種行為的群組 各自分組集合 包含: Save, Destroy, Create
+        const newDatesAntiDurationDuplicated = recordsAnowAntiDuration.map(record => record.date) // 因來源是records, 所以會重複
+        const newDatesAntiDuration = Array.from(new Set(newDatesAntiDurationDuplicated)) // Set可移除重複data且為Obj, 須再轉為Arr
+        // 執行
         g1RecordsSave.push(...recordsBnowTaught, ...recordsAnowFitDuration)
         g2RecordsDestroy.push(...recordsBnowNonTaught, ...recordsAnowAntiDuration, ...recordsAnowAntiNewDates)
         g3DatesCreate.push(...newDatesAntiDuration, ...newDatesAntiRecords)
-        console.log('g1RecordsSave ~~~~~~', g1RecordsSave)
-        console.log('g2RecordsDestroy ~~~~~~', g2RecordsDestroy)
-        console.log('newDatesAntiDuration ~~~~~~ ', newDatesAntiDuration)
-        console.log('g3DatesCreate ~~~~~~', g3DatesCreate)
 
-        // Group for Save
+        // Group1 for Save
         // Do nothing
 
-        // Group for Destroy
+        // Group2 for Destroy
         g2RecordsDestroy.forEach(record => record.destroy())
 
-        // Group for Create
+        // Group3 for Create
         const classNumberInOneDay = lists.length // 每天可約的時段數量有幾個, 且此Lists為browser所選的
         for (let i = 0; i < g3DatesCreate.length; i++ ) {
           for (let j = 0; j < classNumberInOneDay; j++ ) {
@@ -170,43 +158,6 @@ const teacherController = {
           }
         }           
       })
-      // .catch(err => next(err))
-
-      // 可參考如何刪除 不只一組data 
-      // (注意: destroy一次只能刪一組, 所以用forEach 來執行)
-      // return List.findAll({ where: { oclock: 'test for records 1' } })
-      // .then(lists => {
-      //   console.log('lists~~~~', lists)
-      //   return lists.forEach(list => list.destroy()) 
-      // })
-    
-    // 以下是原本的 putProfile的內容 
-    // const { intro, style, link, classDay, duration30or60, nation, teacherName } = req.body
-    // const { file } = req
-
-    // return Promise.all([
-    //   User.findByPk(req.user.id),
-    //   Class.findByPk(req.params.id),
-    //   localFileHandler(file),
-    //   List.findAll({ where: { duration30or60 }, raw: true }),
-    //   Class.findAll({ raw: true }),
-    //   // Record.findAll({ where: { classId }, raw: true })
-    // ])
-    //   .then(([user, classData, filePath, lists, classesDatas]) => {
-    //     if(!user) throw new Error('There is no such user :(')
-    //     if(!classData) throw new Error('You are not a teacher now. Please sign up for 成為老師') 
-    //     const classNumberInOneDay = lists.length // 每天可約的時段數量有幾個
-
-    //     classData.update({ 
-    //       intro, style, link, classDay, duration30or60, nation, teacherName, 
-    //       teacherId: req.user.id,
-    //       image: filePath || classData.image 
-    //     })
-    //     user.update({ 
-    //       nation, intro,           
-    //       name: teacherName, 
-    //       image: filePath || classData.image
-    //     })
       .then(() => {
         req.flash('success_msg', '更新成功')
         return res.redirect('/teacher/profile')        
