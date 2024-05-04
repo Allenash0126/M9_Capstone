@@ -1,4 +1,4 @@
-const { Class, User } = require('../models')
+const { Class, User, Record } = require('../models')
 
 const classController = {
   getClasses: (req, res, next) => {
@@ -10,11 +10,16 @@ const classController = {
   },
   getClass: (req, res, next) => {
     const { id } = req.params
-    return Class.findByPk(id, {
-      raw: true
-    })
-      .then(classData => {
-        res.render('class', { class: classData }
+    return Promise.all([
+      Class.findByPk(id, { raw: true }),
+      Record.findAll({ 
+        where: { classId: id },
+        raw: true
+      })
+    ])
+      .then(([classData, records]) => {
+        records = records.filter(record => !record.studentId)
+        res.render('class', { class: classData, records }
       )})
       .catch(err => next(err))
   },  
@@ -27,6 +32,32 @@ const classController = {
   postComment: (req, res, next) => {
     
     console.log('post it successfully. Wait for DB records')
+  },
+  postRecord: (req, res, next) => {
+    const { selectedTiming } = req.body
+    const studentId = req.user.id
+    const isTeacher = req.user.isTeacher
+    const { id } = req.params
+    const split = selectedTiming.split(',')
+    const timeListId = split[0]
+    const date = split[1]
+
+    if (isTeacher) {
+      return  req.flash('success_msg', '您是老師, 沒有預約課程的權限 : ( ')
+    }
+    return Promise.all([
+      Class.findByPk(id, { raw: true }),
+      Record.findOne({ where: { date, timeListId } })
+    ])
+      .then(([classData, record]) => {
+        record.update({ studentId })
+        if (record.studentId) {
+          res.render('class', { bookingSuccess: classData, class: classData, record: record.toJSON() })
+        } else {
+          res.render('class', { bookingFailed: classData, class: classData, record: record.toJSON() })
+        }
+      })
+      .catch(err => next(err))
   }
 }
 

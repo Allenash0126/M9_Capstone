@@ -29,39 +29,75 @@
   </div>
 
   <div id="right" class="col-4">
-    <h3>預約上課</h3>
-    <p>Time</p>
-    <form action="/records/" method="post">
+    <form action="/classes/records/{{ class.id }}" method="post">
+      <h3>預約上課</h3>
+      <select name="selectedTiming" class="mb-3">
+        <option>請選擇想要上課的時段</option>
+        {{#each records}}
+        <option value="{{ this.timeListId }},{{ this.date }}">{{ this.date }} {{ this.oclock }}</option>
+        {{/each}}
+      </select>
+      <button type="submit" class="btn btn-info text-white">submit</button>
+      <a class="btn btn-outline-info" href="javascript:history.back()">Back</a>
+    </form>
 
-    <!-- Button 觸發 Modal -->
-    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
-      Submit
-    </button>
-    
-    <!-- Modal -->
-    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-      aria-hidden="true">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">確定預約？</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <div class="modal-body">
-            <p>Time</p>
-            <p>Name</p>
-            <p>Link</p>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">關閉</button>
-            <button type="button" class="btn btn-primary" data-dismiss="modal">儲存變更</button>
+    {{#if bookingSuccess}}
+      <script>
+        // 在網頁載入完成後自動彈出模態對話框
+        window.onload = function () {
+          $('#exampleModal').modal('show');
+        };
+      </script>
+    {{/if}}
+
+    {{#if bookingFailed}}
+      <script>
+        // 在網頁載入完成後自動彈出模態對話框
+        window.onload = function () {
+          $('#exampleModal').modal('show');
+        };
+      </script>
+    {{/if}}
+
+      
+      <!-- Modal -->
+      <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+        {{#if bookingSuccess}}
+          <div class="modal-content" style="border-color: #3498db; border-width: 5px">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">預約成功</h5>
+        {{/if}}
+        {{#if bookingFailed}}
+          <div class="modal-content" style="border-color: red; border-width: 5px">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">預約失敗</h5>
+        {{/if}}
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              {{#if bookingSuccess}}
+                <p>您選擇的時間是：<span>{{ record.date }} {{ record.oclock }}</span></p>
+                <p>您選擇的老師是：<span>{{ bookingSuccess.teacherName }}</span></p>
+                <p>您的上課連結是：<span>{{ bookingSuccess.link }}</span></p>
+              {{/if}}
+
+              {{#if bookingFailed}}
+                <p>您選擇的時間是：<span>{{ record.date }} {{ record.oclock }}</span></p>
+                <p>您選擇的老師是：<span>{{ bookingFailed.teacherName }}</span></p>
+                <p>您的上課連結是：<span>{{ bookingFailed.link }}</span></p>
+              {{/if}}
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">確定</button>
+            </div>
           </div>
         </div>
-      </div>
-    </div>
-    </form>
+      </div>    
   </div>
 
 </div>
+

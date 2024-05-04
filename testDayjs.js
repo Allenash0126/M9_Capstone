@@ -149,3 +149,141 @@ console.log('g2', g2)
 const g3 = []
 g3.push(...arr1, ...arr2)
 console.log('g3', g3)
+
+const records = [
+  {
+    id: 248,
+    teacherId: 6,
+    studentId: null,
+    timeListId: 2,
+    score: null,
+    comment: null,
+    date: '2024-05-12 Sunday',
+    oclock: '19:00 - 20:00',
+    classId: 5
+  },
+  {
+    id: 249,
+    teacherId: 6,
+    studentId: null,
+    timeListId: 2,
+    score: null,
+    comment: null,
+    date: '2024-05-05 Sunday',
+    oclock: '19:00 - 20:00',
+    classId: 5,
+  },
+  {
+    id: 250,
+    teacherId: 6,
+    studentId: null,
+    timeListId: 1,
+    score: null,
+    comment: null,
+    date: '2024-05-05 Sunday',
+    oclock: '18:00 - 19:00',
+    classId: 5,
+
+  },
+  {
+    id: 251,
+    teacherId: 6,
+    studentId: null,
+    timeListId: 1,
+    score: null,
+    comment: null,
+    date: '2024-05-12 Sunday',
+    oclock: '18:00 - 19:00',
+    classId: 5,
+  },
+  {
+    id: 252,
+    teacherId: 6,
+    studentId: null,
+    timeListId: 4,
+    score: null,
+    comment: null,
+    date: '2024-05-05 Sunday',
+    oclock: '20:00 - 21:00',
+    classId: 5
+  },
+  {
+    id: 253,
+    teacherId: 6,
+    studentId: null,
+    timeListId: 4,
+    score: null,
+    comment: null,
+    date: '2024-05-12 Sunday',
+    oclock: '20:00 - 21:00',
+    classId: 5
+  },
+  {
+    id: 254,
+    teacherId: 6,
+    studentId: null,
+    timeListId: 1,
+    score: null,
+    comment: null,
+    date: '2024-05-07 Tuesday',
+    oclock: '18:00 - 19:00',
+    classId: 5
+  },
+  {
+    id: 255,
+    teacherId: 6,
+    studentId: null,
+    timeListId: 2,
+    score: null,
+    comment: null,
+    date: '2024-05-07 Tuesday',
+    oclock: '19:00 - 20:00',
+    classId: 5
+  },
+  {
+    id: 256,
+    teacherId: 6,
+    studentId: null,
+    timeListId: 4,
+    score: null,
+    comment: null,
+    date: '2024-05-07 Tuesday',
+    oclock: '20:00 - 21:00',
+    classId: 5
+  },
+  {
+    id: 257,
+    teacherId: 6,
+    studentId: null,
+    timeListId: 1,
+    score: null,
+    comment: null,
+    date: '2024-05-14 Tuesday',
+    oclock: '18:00 - 19:00',
+    classId: 5
+  },
+  {
+    id: 258,
+    teacherId: 6,
+    studentId: null,
+    timeListId: 2,
+    score: null,
+    comment: null,
+    date: '2024-05-14 Tuesday',
+    oclock: '19:00 - 20:00',
+    classId: 5
+  },
+  {
+    id: 259,
+    teacherId: 6,
+    studentId: null,
+    timeListId: 4,
+    score: null,
+    comment: null,
+    date: '2024-05-14 Tuesday',
+    oclock: '20:00 - 21:00',
+    classId: 5
+  }
+]
+
+const recordFormateed = records.map(record => record.date)

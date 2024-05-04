@@ -28,6 +28,7 @@ router.get('/classes/:id/comment', authenticated, classController.getComment)
 router.post('/classes/:id/comment', authenticated, classController.postComment)
 
 router.get('/classes/:id', authenticated, classController.getClass)
+router.post('/classes/records/:id', authenticated, classController.postRecord)
 router.get('/classes', authenticated, classController.getClasses)
 
 router.use('/', (req, res) => res.redirect('/classes'))
