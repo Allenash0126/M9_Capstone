@@ -1,20 +1,33 @@
 const { User, Class, Record, List } = require('../models')
 const { localFileHandler } = require('../helpers/file-helpers')
 const dayjs = require('dayjs');
+const Sequelize = require('sequelize');
 
 const teacherController = {
   getProfile: (req, res, next) => {
     const { id } = req.user
     return Promise.all([
       User.findByPk(id), 
-      Class.findOne({ where: { teacherId: id } })
+      Class.findOne({ where: { teacherId: id } }),
+      Record.findAll({ 
+        where: { 
+          teacherId: id,
+          studentId: { [Sequelize.Op.not]: null } // [Sequelize.Op.not]可以排除某些條件的data, 這裡將沒有studentId者移除 因為沒被預約
+        },  
+        include: [User],
+        raw: true,
+        nest: true
+      })
     ])
-      .then(([user, classData]) => {
+      .then(([user, classData, records]) => {
+        console.log('records~~~', records)
+        console.log('records.slice(0,2)~~~', records.slice(0,2))
         if(!user) throw new Error('There is no such user :(')
         if(!classData) throw new Error(`You haven't filled in any info in 成為老師 form`)
         return res.render('teacher/profile', { 
           user: user.toJSON(),
-          class: classData.toJSON()
+          class: classData.toJSON(),
+          records: records.slice(0,2)
         })
       })
       .catch(err => next(err))

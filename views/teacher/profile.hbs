@@ -5,7 +5,7 @@
         style="width:250px; margin-bottom: 25px; transition: opacity 0.5s; opacity:0;" onload="this.style.opacity=1">
     </div>
     <div id="teacher intro">
-      <h3>{{ record.user.name }}</h3>
+      <h3>{{ user.name }}</h3>
       <p>Nation: {{ class.nation }} </p>
       <p>Score: {{ user.scoreAvg }}</p> {{!-- scoreAvg 從class.model 來  --}}
       <p>About me: {{ class.intro }}</p>
@@ -16,8 +16,10 @@
     <div id="new schedule">
       <h5>New Schedule</h5>
       <div>
-        <p>Time: {{ record.time }} </p>
-        <p>Student's name: {{ record.name }} </p>
+        {{#each records}}
+          <p>Time: {{ this.date }} {{ this.oclock }} </p>
+          <p>Student's name: {{ this.User.name }} </p>
+        {{/each}}
         <p>Session Link: {{ class.link }} </p>
       </div>
     </div>
@@ -30,8 +32,10 @@
     <div id="comment">
       <h5>Recent Review</h5>
       <div>
-        {{ record.score }}
-        {{ record.comment }}
+        {{#each records}}
+          {{ this.score }}
+          {{ this.comment }}
+        {{/each}}
       </div>
     </div>
     <form action="/teacher/profile/{{ user.id }}/edit" method="get">
