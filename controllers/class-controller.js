@@ -4,10 +4,82 @@ const Sequelize = require('sequelize');
 
 const classController = {
   getClasses: (req, res, next) => {
-    return Class.findAll({
-      raw: true
-    })
-      .then(classes => res.render('classes', { classes }))
+    return Promise.all([
+      Class.findAll({ raw: true }),
+      Record.findAll({ 
+        where: { 
+          studentId: { [Sequelize.Op.not]: null }
+        },
+        include: [User],
+        raw: true,
+        nest: true
+      })          
+    ])
+      .then(([classes, records2]) => {
+        const currentDate = dayjs() // 獲取當前日期
+        const recordsBnow = []
+        records2.forEach(record => {
+          const [dateString, dayOfWeek] = record.date.split(' ')
+          if (dayjs(dateString).isBefore(currentDate)) {
+            recordsBnow.push(record)
+          } 
+        })
+
+        // 以下 for records2 Ranking
+        // 取出學生已上過的課
+        const totalRecordsFinishedClass = []       
+        records2.forEach(record2 => {
+          const [dateString, dayOfWeek] = record2.date.split(' ')
+          const dateObj = dayjs(dateString)
+          // if (dateObj.isBefore(currentDate)) { // 拿出學生過去已上課過的課程
+            if (dateObj.isAfter(currentDate)) { // 拿出學生未來已預約的課程
+            totalRecordsFinishedClass.push(record2)
+          } 
+        })   
+
+        // userIdFinishClass：取出 所有已上過課學生的 id 陣列 
+        let userIdFinishClass = totalRecordsFinishedClass.map(record => record.studentId)
+        userIdFinishClass = Array.from(new Set(userIdFinishClass)) // 去除重複
+
+        // dataRawNecessary: 移除多餘data＋重構data格式
+        const dataRawNecessary = totalRecordsFinishedClass.map(record => {
+          return {
+            studentId: record.studentId, 
+            date: record.date,
+            oclock: record.oclock,
+            User: record.User
+          }
+        })
+
+        // 將 userId 依序(forEach) 再重構成必要格式
+        let dataCalculated = []
+        userIdFinishClass.forEach(userId => {
+          const dataFor1User = dataRawNecessary.filter(record => record.studentId === userId)
+          const hours30min = dataFor1User.filter(record => record.oclock.includes('30'))
+          const hours60min = dataFor1User.filter(record => !record.oclock.includes('30'))
+          const totalHours = hours30min.length * 0.5 + hours60min.length * 1
+          dataCalculated.push({ 
+            id: userId,
+            name:  dataFor1User[0].User.name,
+            totalHours: totalHours,
+            image: dataFor1User[0].User.image
+          }) 
+        })
+
+
+        // 完成 ranking
+        const dataSorted = dataCalculated.sort((a, b) => b.totalHours - a.totalHours) // 將obj依totalHours排序
+        const dataRanked = dataSorted.map((data, position) => ({
+          ...data, 
+          ranking: position + 1
+        }))
+        // 下面結果如上, 賦予dataSorted有ranking
+        // for (i = 0; i < dataSorted.length; i++) {
+        //   dataSorted[i].ranking = i + 1
+        // }        
+
+        res.render('classes', { classes, dataRanked })
+      })
       .catch(err => next(err))
   },
   getClass: (req, res, next) => {
@@ -69,7 +141,6 @@ const classController = {
             include: [Class]
           })          
         ])
-
       })
       .then(([record1, records]) => {
         const currentDate = dayjs() // 獲取當前日期
