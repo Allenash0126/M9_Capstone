@@ -1,5 +1,5 @@
 <div id="container" class="d-flex">
-  <div id="left" class="col-4">
+  <div id="left" class="col-4 mb-4">
     <div id="image">
       <img class="image-resposive center-block" src="{{ user.image }}" alt="card image"
         style="width:250px; margin-bottom: 25px; transition: opacity 0.5s; opacity:0;" onload="this.style.opacity=1">
@@ -10,42 +10,63 @@
       <p>Nation: {{ user.nation }}</p>
       <p>About me: {{ user.intro }}</p>
     </div>
-  </div>
 
-  <div id="right" class="col-8">
-    <div id="new schedule">
-      <h5>New Schedule</h5>
-      <div>
-        <p>Time: {{ record.time }} </p>
-        <p>Teacher's Name: {{ record.name }} </p>
-        <p>Session Link: {{ record.class.link }} </p>
-      </div>
-    </div>
-
-    <div id="History">
-      <h5>Lesson History</h5>
-      <div id="teacherImage">
-        <img class="img-fluid" src="{{ record.class.image }}" alt="card image" width="286px" height="180px"
-          style="transition: opacity 0.5s; opacity:0;" onload="this.style.opacity=1">
-      </div>
-      <div>
-        <p>{{ record.teacherId.name }}</p>
-      </div>
-      <div>
-        <a href="/classes/{{ user.id }}/comment"><button>Score</button></a>
-      </div>
-    </div>
-
-    <div id="comment">
-      <h5>Recent Review</h5>
-      <div>
-        {{ record.score }}
-        {{ record.comment }}
-      </div>
-    </div>
     <form action="/users/profile/{{ user.id }}/edit" method="get">
       <button class="btn btn-info text-white">Edit</button>
     </form>
+
+    <a class="btn btn-outline-info" href="javascript:history.back()">Back</a>
   </div>
+
+
+    <div id="right" class="col-8 mb-4">
+      <div id="new schedule">
+        <h5>New Schedule</h5>
+        <div id="right-top">
+          {{#each recordsAfter}}
+            <div id="card" class="card mb-4 shadow-sm">
+              <p>Time: {{ this.date }} {{ this.oclock }}</p>
+              <p>Teacher's Name: {{ this.Class.teacherName }} </p>
+              <p>Session Link: {{ this.Class.link }} </p>
+            </div>
+          {{/each}}
+        </div>
+      </div>
+
+      <div id="History">
+        <h5>Lesson History</h5>
+        {{#each recordsBefore}}
+          <div id="card" class="card mb-4 shadow-sm">
+            <div id="teacherImage">
+              <img class="img-fluid" src="{{ this.Class.image }}" alt="card image" width="70px" height="45px"
+                style="transition: opacity 0.5s; opacity:0;" onload="this.style.opacity=1">
+            </div>
+            <div>
+              <p>{{ this.Class.teacherName }}</p>
+              <p>Time: {{ this.date }} {{ this.oclock }}</p>
+            </div>
+
+            <div id="comment">
+              <p>score: {{ this.score }}</p>
+              <p>comment: {{ this.comment }}</p>
+            </div>
+
+            <div>
+              <a href="/classes/record/{{ this.id }}/comment"><button class="btn btn-info text-white">Score</button></a>
+            </div>
+          </div>
+        {{/each}}
+        <div id="ranking" class="mb-4 mt-4">
+          <h5>Achievement</h5>
+          <div class="card mb-4 shadow-sm">
+            <p>Total Learning Hours: {{ totalHours }}</p>
+            <p>Ranking: No. {{ ranking }}  within {{ numberOfStudents }} students</p>
+          </div>
+        </div>
+
+
+      </div>
+    </div>
+
 
 </div>

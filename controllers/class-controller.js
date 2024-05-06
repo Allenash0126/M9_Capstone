@@ -1,4 +1,5 @@
 const { Class, User, Record } = require('../models')
+const dayjs = require('dayjs');
 
 const classController = {
   getClasses: (req, res, next) => {
@@ -18,20 +19,46 @@ const classController = {
       })
     ])
       .then(([classData, records]) => {
-        records = records.filter(record => !record.studentId)
+        records = records.filter(record => !record.studentId)     
         res.render('class', { class: classData, records }
       )})
       .catch(err => next(err))
   },  
   getComment: (req, res, next) => {
     const { id } = req.params
-    return User.findByPk(id, { raw: true })
-      .then(user => res.render('comment', { user }))
+    return Record.findByPk(id, { 
+      include: [Class],
+      raw: true,
+      nest: true
+    })
+      .then(record => {
+        if(!record) throw new Error('There is no such record')
+        if (record.studentId !== req.user.id) throw new Error('You can comment your teacher only')
+        res.render('comment', { record })
+      })
       .catch(err => next(err))
   },
   postComment: (req, res, next) => {
-    
-    console.log('post it successfully. Wait for DB records')
+    const { comment, score } = req.body
+    const { id } = req.params
+    return Promise.all([
+      Record.findByPk(id),
+      Record.findByPk(id, { 
+        include: [Class],
+        raw: true,
+        nest: true
+      })
+    ])
+      .then(([record1, record2]) => {
+        if(!record2) throw new Error('There is no such record')
+        if (record2.studentId !== req.user.id) throw new Error('You can comment your teacher only')
+        return record1.update({ comment, score })        
+      })
+      .then(record1 => {
+        req.flash('succes_msg', 'Commented successfully')
+        return res.redirect(`/users/${record1.studentId}/profile`)
+      })
+      .catch(err => next(err))
   },
   postRecord: (req, res, next) => {
     const { selectedTiming } = req.body

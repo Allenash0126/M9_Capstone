@@ -3,6 +3,7 @@ const dayjs = require('dayjs');
 const { User, Class, List, Record } = require('../models')
 const { localFileHandler } = require('../helpers/file-helpers')
 const { recordCreator } = require('../helpers/record-helpers')
+const Sequelize = require('sequelize');
 
 const userController = {
   signUpPage: (req, res) => {
@@ -104,12 +105,96 @@ const userController = {
   },
   getProfile: (req, res, next) => {
     const { id } = req.params
+    if (parseInt(id) !== req.user.id) throw new Error('You can see your own profile.')
     return Promise.all([
       User.findByPk(id, { raw: true }),
-      Class.findOne({ where: { teacherId: id }, raw: true })
+      Record.findAll({ 
+        where: { 
+          studentId: id,
+          date: { [Sequelize.Op.not]: null } 
+        }, 
+        include: [User, Class],
+        raw: true,
+        nest: true
+      }),
+      // 目標：這個record2 是為了取出學生已上過的課
+      // 方式：拿出所有 有被學生預約 or 已完成課程的課
+      // 方式：換句話說：先排除 有開課但沒學生約的課
+      Record.findAll({ 
+        where: {  
+          studentId: { [Sequelize.Op.not]: null } 
+        },
+        raw: true
+      })
     ])
-      .then(([user, classData]) => {
-        res.render('profile', { user, class: classData })
+      .then(([user, records, records2]) => {
+        // 取出未來的 records
+        const currentDate = dayjs() // 獲取當前日期
+        const recordsBefore = []
+        const recordsAfter = []
+        records.forEach(record => {
+          const [dateString, dayOfWeek] = record.date.split(' ')
+          const dateObj = dayjs(dateString)
+          if (dateObj.isAfter(currentDate)) {
+            recordsAfter.push(record)
+          } else {
+            recordsBefore.push(record)
+          }
+        })
+
+        // 以下 for records2 Ranking
+        // 取出學生已上過的課
+        const totalRecordsFinishedClass = []       
+        records2.forEach(record2 => {
+          const [dateString, dayOfWeek] = record2.date.split(' ')
+          const dateObj = dayjs(dateString)
+          if (dateObj.isBefore(currentDate)) { // 拿出學生過去已上課過的課程
+            // if (dateObj.isAfter(currentDate)) { // 拿出學生未來已預約的課程
+            totalRecordsFinishedClass.push(record2)
+          } 
+        })   
+
+        // userIdFinishClass：取出 所有已上過課學生的 id 陣列 
+        let userIdFinishClass = totalRecordsFinishedClass.map(record => record.studentId)
+        userIdFinishClass = Array.from(new Set(userIdFinishClass)) // 去除重複
+
+        // dataRawNecessary: 移除多餘data＋重構data格式
+        const dataRawNecessary = totalRecordsFinishedClass.map(record => {
+          return {
+            studentId: record.studentId, 
+            date: record.date,
+            oclock: record.oclock
+          }
+        })
+
+        // 將 userId 依序(forEach) 再重構成必要格式
+        let dataCalculated = []
+        userIdFinishClass.forEach(userId => {
+          const dataFor1User = dataRawNecessary.filter(result => result.studentId === userId)
+          const hours30min = dataFor1User.filter(record => record.oclock.includes('30'))
+          const hours60min = dataFor1User.filter(record => !record.oclock.includes('30'))
+          const totalHours = hours30min.length * 0.5 + hours60min.length * 1
+          dataCalculated.push({ 
+            id: userId,
+            totalHours: totalHours
+          }) 
+        })
+
+        // 完成 ranking
+        const dataSorted = dataCalculated.sort((a, b) => b.totalHours - a.totalHours) // 將obj依totalHours排序
+        const useIdSorted = dataSorted.map(obj => obj.id) // 依totalHours排序 成arr
+        const ranking = useIdSorted.indexOf(req.user.id) + 1
+        const totalHours = dataSorted.find(obj => obj.id === req.user.id).totalHours        
+        const numberOfStudents = dataSorted.length
+
+        res.render('profile', { 
+          user, 
+          recordsBefore: recordsBefore.slice(0,2),
+          recordsAfter: recordsAfter.slice(0,2),
+          ranking,
+          totalHours,
+          numberOfStudents
+        })          
       })
       .catch(err => next(err))
   },

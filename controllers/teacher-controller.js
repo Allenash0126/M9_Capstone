@@ -20,8 +20,6 @@ const teacherController = {
       })
     ])
       .then(([user, classData, records]) => {
-        console.log('records~~~', records)
-        console.log('records.slice(0,2)~~~', records.slice(0,2))
         if(!user) throw new Error('There is no such user :(')
         if(!classData) throw new Error(`You haven't filled in any info in 成為老師 form`)
         return res.render('teacher/profile', { 

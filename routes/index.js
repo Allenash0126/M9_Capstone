@@ -24,8 +24,8 @@ router.get('/users/profile/:id/edit', authenticated, userController.editProfile)
 router.get('/users/:id/profile', authenticated, userController.getProfile)
 router.put('/users/:id/profile', upload.single('image'), authenticated, userController.putProfile)
 
-router.get('/classes/:id/comment', authenticated, classController.getComment)
-router.post('/classes/:id/comment', authenticated, classController.postComment)
+router.get('/classes/record/:id/comment', authenticated, classController.getComment)
+router.post('/classes/record/:id/comment', authenticated, classController.postComment)
 
 router.get('/classes/:id', authenticated, classController.getClass)
 router.post('/classes/records/:id', authenticated, classController.postRecord)

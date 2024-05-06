@@ -1,23 +1,23 @@
 <div class="mb-4 text-center">
   <h1 class="h3 font-weight-normal mb-3">分享本次的課程體驗</h1>
 </div>
-<form class="form-signup" action="/class/{{ user.id }}/comment" method="POST" style="width: 100%;">
+<form class="form-signup" action="/classes/record/{{ record.id }}/comment" method="POST" style="width: 100%;">
   <div class="form-row mb-3">
-    <p>Teacher: {{ record.teacherName }}</p>
+    <p>Teacher: {{ record.Class.teacherName }}</p>
   </div>
   <div class="form-row mb-3">
-    <p>Time: {{ record.time }}</p>
+    <p>Time: {{ record.date }} {{ record.oclock }}</p>
   </div>
   <div class="form-row mb-3">
     <label class="form-label" for="score">Score (1~5) : </label>
-    <input type="text" id="score" name="score" class="form-control" placeholder="score" required>
+    <input type="number" id="score" name="score" class="form-control" placeholder="score" value="{{ record.score }}" required>
   </div>
   <div class="form-row mb-3">
     <label class="form-label" for="comment">Comment : </label>
-    <input type="text" id="comment" name="comment" class="form-control" placeholder="comment">
+    <input type="text" id="comment" name="comment" class="form-control" placeholder="comment" value="{{ record.comment }}" required>
   </div>
   <button class="btn btn-info text-white btn-block mb-2" type="submit">Submit</button>
 </form>
 <a href="/classes">
-  <button class="btn btn-info text-white mt-2">Cancel</button>
+  <a class="btn btn-outline-info" href="javascript:history.back()">Back</a>
 </a>
