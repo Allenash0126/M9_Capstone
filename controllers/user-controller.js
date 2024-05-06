@@ -189,7 +189,7 @@ const userController = {
 
         res.render('profile', { 
           user, 
-          recordsBefore: recordsBefore.slice(0,2),
+          recordsBefore: recordsBefore.slice(0,5),
           recordsAfter: recordsAfter.slice(0,2),
           ranking,
           totalHours,

@@ -14,18 +14,37 @@ const teacherController = {
           teacherId: id,
           studentId: { [Sequelize.Op.not]: null } // [Sequelize.Op.not]可以排除某些條件的data, 這裡將沒有studentId者移除 因為沒被預約
         },  
-        include: [User],
+        include: [User,Class],
         raw: true,
         nest: true
-      })
+      }),
     ])
       .then(([user, classData, records]) => {
         if(!user) throw new Error('There is no such user :(')
         if(!classData) throw new Error(`You haven't filled in any info in 成為老師 form`)
+        const currentDate = dayjs() // 獲取當前日期
+
+        const recordsAnow = []
+        const recordsBnow = []
+        records.forEach(record => {
+          const [dateString, dayOfWeek] = record.date.split(' ')
+          if (dayjs(dateString).isAfter(currentDate)) {
+            recordsAnow.push(record)
+          } else {
+            recordsBnow.push(record)
+          }
+        })
+
+        const results1 = recordsAnow
+        const results2 = recordsBnow.filter(record => record.score)
+        
         return res.render('teacher/profile', { 
           user: user.toJSON(),
           class: classData.toJSON(),
-          records: records.slice(0,2)
+          records: results1.slice(0,2),
+          records2: results2.slice(0,5),
+          scoreAvg: classData.scoreAvg,
+          // scoreAvg: results2[0].Class.scoreAvg
         })
       })
       .catch(err => next(err))
