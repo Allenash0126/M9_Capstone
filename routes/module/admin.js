@@ -7,6 +7,7 @@ router.get('/timelists', adminController.getTimeLists) // 上面兩者 adminCont
 router.post('/timelists', adminController.postTimeList)
 router.put('/timelists/:id', adminController.putTimeList)
 router.delete('/timelists/:id', adminController.deleteTimeList)
-router.use('/', (req, res) => res.redirect('/admin/timelists'))
+router.get('/userlists', adminController.getUserLists)
+router.use('/', (req, res) => res.redirect('/admin/userlists'))
 
 module.exports = router

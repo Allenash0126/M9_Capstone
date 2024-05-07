@@ -1,6 +1,29 @@
 const { User, Class, List } = require('../models')
 
 const adminController = {
+  getUserLists: (req, res, next) => {
+    return User.findAll({ raw: true })
+      .then(users => {
+        // 僅保留必要資訊
+        const dataRemoveUnnecessary = users.map(user => {
+          return {
+            id: user.id,
+            name: user.name,
+            isTeacher: user.isTeacher
+          }
+        })
+
+        // 將 isTeacher 由布林值 轉Yes or No
+        dataRemoveUnnecessary.forEach(data => {
+          if (data.isTeacher) {
+            data.isTeacher = 'Yes'
+          } else {
+            data.isTeacher = 'No'
+          }
+        })
+        return res.render('admin/user-list', { users: dataRemoveUnnecessary })
+      })
+  },
   getTimeLists: (req, res, next) => {
     return Promise.all([
       List.findAll({ raw: true }),
