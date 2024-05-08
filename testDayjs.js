@@ -1,4 +1,6 @@
 const dayjs = require('dayjs');
+const { User } = require('./models')
+const Sequelize = require('sequelize')
 
 // // 獲取當前日期
 // const today = dayjs();
@@ -66,7 +68,7 @@ for (let i = 0; i < 14; i++) {
 }
 
 // 輸出結果
-console.log('dates 老師可以上課的所有日期', dates);
+// console.log('dates 老師可以上課的所有日期', dates);
 
 
 const objY = {};
@@ -75,7 +77,7 @@ dates.forEach(date => {
   objY[date] = [2, 3, 4];
 });
 
-console.log('objY 老師可上課的所有日期＋所有時段', objY);
+// console.log('objY 老師可上課的所有日期＋所有時段', objY);
 
 const list = [2, 3, 4]
 
@@ -87,7 +89,7 @@ for(i = 0; i < dates.length; i++) {
   }
 }
 
-console.log('newArr 分別紀錄老師可上課的日期＋時段', newArr);
+// console.log('newArr 分別紀錄老師可上課的日期＋時段', newArr);
 
 
 
@@ -112,14 +114,14 @@ oldDates.forEach(date => {
   }
 });
 
-console.log('當前日期之前的日期：', beforeCurrentDate);
-console.log('當前日期之後的日期：', afterCurrentDate);
+// console.log('當前日期之前的日期：', beforeCurrentDate);
+// console.log('當前日期之後的日期：', afterCurrentDate);
 
 const exam1 = '0'
 const exam2 = '1'
 
-console.log('!exam1', !parseInt(exam1))
-console.log('!exam2', !parseInt(exam2))
+// console.log('!exam1', !parseInt(exam1))
+// console.log('!exam2', !parseInt(exam2))
 
 
 const arr1 = [{
@@ -139,16 +141,16 @@ const arr2 = [{
 
 const g1 = []
 g1.push(arr1, arr2)
-console.log('g1', g1)
+// console.log('g1', g1)
 
 const g2 = []
 g2.push(arr1)
 g2.push(arr2)
-console.log('g2', g2)
+// console.log('g2', g2)
 
 const g3 = []
 g3.push(...arr1, ...arr2)
-console.log('g3', g3)
+// console.log('g3', g3)
 
 const records = [
   {
@@ -287,3 +289,92 @@ const records = [
 ]
 
 const recordFormateed = records.map(record => record.date)
+
+
+//
+
+const faker = require('faker')
+const bcrypt = require('bcryptjs')
+
+const seedStudent = Array.from({ length: 5 }, (n, i) => ({
+  name: `user${i + 1}`,
+  email: `user${i + 1}@example.com`,
+  // password: await bcrypt.hash('12345678', 10),
+  password: bcrypt.hash('12345678', 10),
+  intro: faker.lorem.text().slice(0, 20),
+  image: `https://loremflickr.com/320/240/dog/?random=${Math.random() * 100}`,
+  is_teacher: false,
+  nation: 'Taiwan',
+  created_at: new Date,
+  updated_at: new Date
+}))
+const seedTeacher = Array.from({ length: 10 }, (n, i) => ({
+  name: faker.name.findName(),
+  email: faker.internet.email(),
+  // password: await bcrypt.hash('12345678', 10),
+  password: bcrypt.hash('12345678', 10),
+  intro: faker.lorem.text().slice(0, 20),
+  image: `https://loremflickr.com/320/240/cat/?random=${Math.random() * 100}`,
+  is_teacher: true,
+  nation: 'USA',
+  created_at: new Date,
+  updated_at: new Date
+}))
+
+const seedAmin = {
+  name: 'root',
+  email: 'root@example.com',
+  // password: await bcrypt.hash('12345678', 10),
+  password: bcrypt.hash('12345678', 10),
+  intro: faker.lorem.text().slice(0, 20),
+  image: `https://loremflickr.com/320/240/cat/?random=${Math.random() * 100}`,
+  is_teacher: false,
+  nation: 'USA',
+  created_at: new Date,
+  updated_at: new Date
+}
+// console.log('testArray~~', seedStudent)
+// console.log('seedTeacher~~', seedTeacher)
+// console.log('seedAmin~~', seedAmin)
+
+const seeder = [seedAmin, ...seedStudent, ...seedTeacher]
+// console.log('seeder~~', seeder)
+
+
+// for classDay 不重複
+
+
+User.findAll({ 
+  where: { nation: { [Sequelize.Op.like]: '%seeder%' } } 
+})
+  .then(users => {
+    const classData = users.map(user => {
+
+      const weekdays = ['0','1','2','3','4','5','6']
+      const randomA = Math.floor(Math.random()*7).toString()
+      const weekdaysLeft = weekdays.filter(day => day !== randomA)
+      const magicNumber = Math.floor(Math.random()*6)
+      let randomB = weekdaysLeft.slice(magicNumber, magicNumber+1)
+      randomB = randomB[0] // 將矩陣內的字串拿出來
+
+      return {
+        teacher_id: user.id,
+        teacher_name: user.name,
+        duration30or60: true,
+        class_day: [randomA, randomB],
+        nation: user.nation,
+        style: faker.lorem.text().slice(0, 20),
+        intro: user.intro,
+        image: user.image,
+        link: `www.${Math.floor(Math.random()*10)}${Math.floor(Math.random()*10)}${Math.floor(Math.random()*10)}.com`,
+        created_at: new Date,
+        updated_at: new Date
+      }
+    })
+    console.log('classData~~~~~', classData)
+  })
+
+// console.log('randomA~~', randomA)
+// console.log('weekdaysLeft~~', weekdaysLeft)
+// console.log('magicNumber~~', magicNumber)
+// console.log('randomB~~', randomB)
