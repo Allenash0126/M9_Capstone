@@ -344,37 +344,43 @@ const seeder = [seedAmin, ...seedStudent, ...seedTeacher]
 // for classDay 不重複
 
 
-User.findAll({ 
-  where: { nation: { [Sequelize.Op.like]: '%seeder%' } } 
-})
-  .then(users => {
-    const classData = users.map(user => {
+// User.findAll({ 
+//   where: { nation: { [Sequelize.Op.like]: '%seeder%' } } 
+// })
+//   .then(users => {
+//     const classData = users.map(user => {
 
-      const weekdays = ['0','1','2','3','4','5','6']
-      const randomA = Math.floor(Math.random()*7).toString()
-      const weekdaysLeft = weekdays.filter(day => day !== randomA)
-      const magicNumber = Math.floor(Math.random()*6)
-      let randomB = weekdaysLeft.slice(magicNumber, magicNumber+1)
-      randomB = randomB[0] // 將矩陣內的字串拿出來
+//       const weekdays = ['0','1','2','3','4','5','6']
+//       const randomA = Math.floor(Math.random()*7).toString()
+//       const weekdaysLeft = weekdays.filter(day => day !== randomA)
+//       const magicNumber = Math.floor(Math.random()*6)
+//       let randomB = weekdaysLeft.slice(magicNumber, magicNumber+1)
+//       randomB = randomB[0] // 將矩陣內的字串拿出來
 
-      return {
-        teacher_id: user.id,
-        teacher_name: user.name,
-        duration30or60: true,
-        class_day: [randomA, randomB],
-        nation: user.nation,
-        style: faker.lorem.text().slice(0, 20),
-        intro: user.intro,
-        image: user.image,
-        link: `www.${Math.floor(Math.random()*10)}${Math.floor(Math.random()*10)}${Math.floor(Math.random()*10)}.com`,
-        created_at: new Date,
-        updated_at: new Date
-      }
-    })
-    console.log('classData~~~~~', classData)
-  })
+//       return {
+//         teacher_id: user.id,
+//         teacher_name: user.name,
+//         duration30or60: true,
+//         class_day: [randomA, randomB],
+//         nation: user.nation,
+//         style: faker.lorem.text().slice(0, 20),
+//         intro: user.intro,
+//         image: user.image,
+//         link: `www.${Math.floor(Math.random()*10)}${Math.floor(Math.random()*10)}${Math.floor(Math.random()*10)}.com`,
+//         created_at: new Date,
+//         updated_at: new Date
+//       }
+//     })
+//     // console.log('classData~~~~~', classData)
+//   })
 
 // console.log('randomA~~', randomA)
 // console.log('weekdaysLeft~~', weekdaysLeft)
 // console.log('magicNumber~~', magicNumber)
 // console.log('randomB~~', randomB)
+
+const cht = 1
+if (cht) {
+  return console.log('it is 1 ')
+} 
+console.log('it is 2 ')

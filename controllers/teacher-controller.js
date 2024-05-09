@@ -7,19 +7,38 @@ const teacherController = {
   getProfile: (req, res, next) => {
     const { id } = req.user
     return Promise.all([
+      
+      // (1) for common user
       User.findByPk(id), 
       Class.findOne({ where: { teacherId: id } }),
       Record.findAll({ 
         where: { 
           teacherId: id,
-          studentId: { [Sequelize.Op.not]: null } // [Sequelize.Op.not]可以排除某些條件的data, 這裡將沒有studentId者移除 因為沒被預約
+          studentId: { [Sequelize.Op.not]: null } 
+          // [Sequelize.Op.not]可以排除某些條件的data, 這裡將沒有studentId者移除 因為沒被預約
         },  
         include: [User,Class],
         raw: true,
         nest: true
       }),
+
+      // (2) for seeder
+      User.findAll({ // 只取出seeder的學生 排除老師＋root
+        where: { 
+          nation: { [Sequelize.Op.like]: '%seeder%' },
+          email: { 
+            [Sequelize.Op.like]: '%example%', 
+            [Sequelize.Op.notLike]: '%root%', 
+          }
+        }
+      }),
+      Record.findAll({ 
+        where: { teacherId: id },
+        raw: true
+      })
     ])
-      .then(([user, classData, records]) => {
+      .then(([user, classData, records, studentSeeders, recordSeeders]) => {
+        // (1) for common user
         if(!user) throw new Error('There is no such user :(')
         if(!classData) throw new Error(`You haven't filled in any info in 成為老師 form`)
         const currentDate = dayjs() // 獲取當前日期
@@ -37,14 +56,91 @@ const teacherController = {
 
         const results1 = recordsAnow
         const results2 = recordsBnow.filter(record => record.score)
+
+        // (2) for seeder
+        if (user.nation.includes('seeder')) {
+          const newDates = [] 
+          let currentDate = dayjs() 
+          for (let i = 0; i < 15; i++) {
+            // 商業邏輯：定義 當日不能被預約, 故跳過今天符合user選擇的星期幾
+            if (i === 0) { 
+              currentDate = currentDate.add(1, 'day')
+              continue
+            }
+            if (classData.classDay.some(day => parseInt(day) === currentDate.day())) {
+              const formattedDate = currentDate.format('YYYY-MM-DD dddd')
+              newDates.push(formattedDate);
+            }
+            currentDate = currentDate.add(1, 'day')
+          }
+          currentDate = dayjs() // 把 currentDate 調整回今天的日期
+
+          // 若此老師為「首次」登入, 則直接新增兩筆 data
+          if (!recordSeeders.length) {
+            const idStudentSeeders  = studentSeeders.map(studentSeeder => studentSeeder.id)
+
+            const recordCreate1 = {
+              teacherId: id,
+              studentId: idStudentSeeders[Math.floor(Math.random()*idStudentSeeders.length)],
+              date: newDates[0],
+              timeListId: 1,
+              oclock: '18:00 - 19:00', 
+              classId: classData.id
+            }
+            const recordCreate2 = {
+              teacherId: id,
+              studentId: idStudentSeeders[Math.floor(Math.random()*idStudentSeeders.length)],
+              date: newDates[0],
+              timeListId: 2,
+              oclock: '19:00 - 20:00', 
+              classId: classData.id
+            }
+
+            return Promise.all([
+              Record.create(recordCreate1),          
+              Record.create(recordCreate2)
+            ])
+
+          // 若「非」首次登入, 則判定之前的records是否過期了  
+          } else {
+            const lastDateRecordSeeder = recordSeeders[recordSeeders.length - 1].date // 取最後一筆 data
+            const [dateString, dayOfWeek] = lastDateRecordSeeder.split(' ')
+            const dateObj = dayjs(dateString) // 將字串轉成物件, 讓外掛 dayjs 可執行 isBefore          
+            
+            if (dateObj.isBefore(currentDate, 'day')) {
+              const idStudentSeeders  = studentSeeders.map(studentSeeder => studentSeeder.id)
+
+              const recordCreate1 = {
+                teacherId: id,
+                studentId: idStudentSeeders[Math.floor(Math.random()*idStudentSeeders.length)],
+                date: newDates[0],
+                timeListId: 1,
+                oclock: '18:00 - 19:00', 
+                classId: classData.id
+              }
+              const recordCreate2 = {
+                teacherId: id,
+                studentId: idStudentSeeders[Math.floor(Math.random()*idStudentSeeders.length)],
+                date: newDates[0],
+                timeListId: 2,
+                oclock: '19:00 - 20:00', 
+                classId: classData.id
+              }
+
+              return Promise.all([
+                Record.create(recordCreate1),          
+                Record.create(recordCreate2)
+              ])
+            }
+          }
+        }
         
         return res.render('teacher/profile', { 
           user: user.toJSON(),
           class: classData.toJSON(),
           records: results1.slice(0,2),
           records2: results2.slice(0,5),
-          scoreAvg: classData.scoreAvg,
-          // scoreAvg: results2[0].Class.scoreAvg
+          scoreAvg: classData.scoreAvg
         })
       })
       .catch(err => next(err))
