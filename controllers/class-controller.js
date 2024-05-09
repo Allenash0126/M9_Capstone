@@ -4,6 +4,8 @@ const Sequelize = require('sequelize');
 
 const classController = {
   getClasses: (req, res, next) => {
+    const { keywords } = req.query
+
     return Promise.all([
       Class.findAll({ raw: true }),
       Record.findAll({ 
@@ -76,15 +78,20 @@ const classController = {
         // 下面結果如上, 賦予dataSorted有ranking
         // for (i = 0; i < dataSorted.length; i++) {
         //   dataSorted[i].ranking = i + 1
-        // }        
+        // }
 
-        res.render('classes', { classes, dataRanked })
+        // 關於 search bar
+        if (keywords) {
+          classes = classes.filter(classData => classData.teacherName.includes(keywords))
+          return res.render('classes', { classes, dataRanked })          
+        }
+
+        return res.render('classes', { classes, dataRanked })
       })
       .catch(err => next(err))
   },
   getClass: (req, res, next) => {
     const { id } = req.params
-    console.log('id~~~~~~', id)
     return Promise.all([
       Class.findByPk(id, { raw: true }),
       Record.findAll({ 
