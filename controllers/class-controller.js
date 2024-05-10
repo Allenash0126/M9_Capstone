@@ -1,13 +1,23 @@
 const { Class, User, Record } = require('../models')
 const dayjs = require('dayjs');
-const Sequelize = require('sequelize');
+const Sequelize = require('sequelize')
+const { getOffset, getPagination } = require('../helpers/pagination-helper');
 
 const classController = {
   getClasses: (req, res, next) => {
-    const { keywords } = req.query
+    
+    // 問號的好處：如果 req.query.keyword 為 null 或 undefined，則整個表達式將返回 undefined，而不會引發錯誤。這樣可以防止出現 Cannot read property 'trim' of null 或 Cannot read property 'trim' of undefined 的錯誤。
+    const keywords = req.query.keywords?.trim() 
+
+    const DEFAULT_LIMIT = 5
+    const page = Number(req.query.page) || 1
+    const limit = Number(req.query.limit) || DEFAULT_LIMIT
+    const offset = getOffset(limit, page)
 
     return Promise.all([
-      Class.findAll({ raw: true }),
+      Class.findAndCountAll({ 
+        raw: true,
+      }),
       Record.findAll({ 
         where: { 
           studentId: { [Sequelize.Op.not]: null }
@@ -75,18 +85,21 @@ const classController = {
           ...data, 
           ranking: position + 1
         }))
-        // 下面結果如上, 賦予dataSorted有ranking
-        // for (i = 0; i < dataSorted.length; i++) {
-        //   dataSorted[i].ranking = i + 1
-        // }
 
-        // 關於 search bar
-        if (keywords) {
-          classes = classes.filter(classData => classData.teacherName.includes(keywords))
-          return res.render('classes', { classes, dataRanked })          
-        }
+        // for search bar & pagination
+        // 用 keywords 控制, 若存在 就傳入filter結果 ; 若不存在 就直接回傳 for 首頁
+        const matchedClasses = keywords ? classes.rows.filter(classData => classData.teacherName.toLowerCase().includes(keywords.toLowerCase())).slice(offset, offset+limit) : classes.rows.slice(offset, offset+limit)
 
-        return res.render('classes', { classes, dataRanked })
+        return res.render('classes', { 
+          dataRanked,
+          classes: matchedClasses, 
+          keywords,
+          pagination: getPagination( // 第三個參數為總數, 依據是否有 keywords 放上filter數量、或全部class數量
+            limit, 
+            page, 
+            keywords ? classes.rows.filter(classData => classData.teacherName.toLowerCase().includes(keywords.toLowerCase())).length : classes.count
+          )
+        })
       })
       .catch(err => next(err))
   },
