@@ -97,3 +97,4 @@ dist
 .pnp.*
 temp/
 upload/
+.env/

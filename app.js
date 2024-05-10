@@ -10,14 +10,18 @@ const { getUser } = require('./helpers/auth-helpers')
 const app = express();
 const routes = require('./routes')
 const port = 3000;
-const SESSION_SECRET = 'secret'
+// const SESSION_SECRET = 'secret'
+
+if (process.env.NODE_ENV === 'development') {
+  require('dotenv').config()
+}
 
 app.engine('.hbs', engine({extname: '.hbs', helpers: handlebarsHelpers}))
 app.set('view engine', '.hbs')
 app.set('views', './views')
 // app.use(express.static('public'))
 app.use(express.urlencoded({ extended: true })) // 可在post拿到值 from form
-app.use(session({ secret: SESSION_SECRET, resave: false, saveUninitialized: false }))
+app.use(session({ secret: process.env.SESSION_SECRET, resave: false, saveUninitialized: false }))
 app.use(passport.initialize())
 app.use(passport.session())
 app.use(flash())

@@ -18,6 +18,8 @@ router.get('/signup', userController.signUpPage)
 router.post('/signup', userController.signUp)
 router.get('/signin', userController.signInPage)
 router.post('/signin', passport.authenticate('local', { failureRedirect: '/signin', failureFlash: true }), userController.signIn)
+router.get('/signin/facebook', passport.authenticate('facebook', { scope: ['email'] }))
+router.get('/oauth2/redirect/facebook', passport.authenticate('facebook', { successRedirect: '/classes',failureRedirect: '/signin', failureFlash: true }))
 router.get('/logout', userController.logout)
 
 router.get('/users/profile/:id/edit', authenticated, userController.editProfile)
