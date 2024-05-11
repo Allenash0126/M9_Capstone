@@ -278,7 +278,7 @@ const classController = {
         if (record2.studentId !== req.user.id) throw new Error('You can comment your teacher only')
         const { teacherId } = record2.Class
         record1.update({ comment, score })        
-        req.flash('succes_msg', 'Commented successfully')
+        req.flash('success_msg', 'Commented successfully')
 
         // 以下 for 計算scoreAvg 並存入
         return Promise.all([
@@ -324,7 +324,8 @@ const classController = {
     const date = split[1]
 
     if (isTeacher) {
-      return  req.flash('success_msg', '您是老師, 沒有預約課程的權限 : ( ')
+      req.flash('error_msg', '您是老師, 沒有預約課程的權限 : ( ')
+      return res.redirect(`/classes/${id}`)
     }
     return Promise.all([
       Class.findByPk(id, { raw: true }),
