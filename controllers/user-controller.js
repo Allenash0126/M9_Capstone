@@ -184,7 +184,7 @@ const userController = {
         const dataSorted = dataCalculated.sort((a, b) => b.totalHours - a.totalHours) // 將obj依totalHours排序
         const useIdSorted = dataSorted.map(obj => obj.id) // 依totalHours排序 成arr
         const ranking = useIdSorted.indexOf(req.user.id) + 1
-        const totalHours = dataSorted.find(obj => obj.id === req.user.id).totalHours        
+        const totalHours = dataSorted.find(obj => obj.id === req.user.id)?.totalHours // 串連運算子: 前者有值才繼續, 無值也不會引發錯誤
         const numberOfStudents = dataSorted.length
 
         res.render('profile', { 
