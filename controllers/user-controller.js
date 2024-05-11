@@ -200,6 +200,10 @@ const userController = {
   },
   editProfile: (req, res, next) => {
     const { id } = req.params
+    if (parseInt(id) !== req.user.id) {
+      req.flash('error_msg', 'You can see your own profile only.')
+      return res.redirect(`/classes`)
+    }
     return User.findByPk(id, { raw: true })
       .then(user => res.render('edit-profile', { user }))
       .catch(err => next(err))

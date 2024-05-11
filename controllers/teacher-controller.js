@@ -169,13 +169,23 @@ const teacherController = {
         currentDate = currentDate.add(1, 'day')
         continue
       }
-      if (classDay.some(day => parseInt(day) === currentDate.day())) {
-        const formattedDate = currentDate.format('YYYY-MM-DD dddd')
-        newDates.push(formattedDate);
+      // 判定：先確認是否老師每週只選一天課程 不論是否後續動作都一樣, 只差在判斷式
+      // 因為：若只選一天課程就非 array, 而是string, 但 some 只能用於array（多天課程）
+      if (classDay.length < 2) {
+        if (parseInt(classDay) === currentDate.day()) {
+          const formattedDate = currentDate.format('YYYY-MM-DD dddd')
+          newDates.push(formattedDate);
+        }
+        currentDate = currentDate.add(1, 'day')      
+      } else {
+        if (classDay.some(day => parseInt(day) === currentDate.day())) {
+          const formattedDate = currentDate.format('YYYY-MM-DD dddd')
+          newDates.push(formattedDate);
+        }
+        currentDate = currentDate.add(1, 'day')            
       }
-      currentDate = currentDate.add(1, 'day')
     }  
-    currentDate = dayjs() // 把 currentDate 調整回今天的日期
+    currentDate = dayjs() // 把 currentDate 調整回今天的日期  
 
     return Promise.all([
       User.findByPk(req.user.id),
