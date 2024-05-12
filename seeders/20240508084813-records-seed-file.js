@@ -11,7 +11,7 @@ module.exports = {
         where: { 
           nation: { [Sequelize.Op.like]: '%seeder%' }, // 只把seeder拿進來
           name: { 
-            [Sequelize.Op.notLike]: '%user%', // 排除學生
+            [Sequelize.Op.notLike]: '%user%', // 只取老師
             [Sequelize.Op.not]: 'root' 
           },
         },
@@ -23,7 +23,7 @@ module.exports = {
         where: { 
           nation: { [Sequelize.Op.like]: '%seeder%' }, // 只把seeder拿進來
           name: { 
-            [Sequelize.Op.like]: '%user%', // 排除學生
+            [Sequelize.Op.like]: '%user%', // 只取學生 
             [Sequelize.Op.not]: 'root' 
           },
         },

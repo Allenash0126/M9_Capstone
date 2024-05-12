@@ -55,9 +55,10 @@ const teacherController = {
         })
 
         const results1 = recordsAnow
-        const results2 = recordsBnow.filter(record => record.score)
+        const results2 = recordsBnow
 
         // (2) for seeder
+        const recordCreatePromise = [] // 為了確保以下都建立完成後 再統一render, 避免asyn導致未寫入完成就render空物件
         if (user.nation.includes('seeder')) {
           const newDates = [] 
           let currentDate = dayjs() 
@@ -96,10 +97,10 @@ const teacherController = {
               classId: classData.id
             }
 
-            return Promise.all([
+            recordCreatePromise.push(              
               Record.create(recordCreate1),          
               Record.create(recordCreate2)
-            ])
+            )
 
           // 若「非」首次登入, 則判定之前的records是否過期了  
           } else {
@@ -127,21 +128,24 @@ const teacherController = {
                 classId: classData.id
               }
 
-              return Promise.all([
+              recordCreatePromise.push(              
                 Record.create(recordCreate1),          
                 Record.create(recordCreate2)
-              ])
+              )
             }
           }
         }
-        
-        return res.render('teacher/profile', { 
-          user: user.toJSON(),
-          class: classData.toJSON(),
-          records: results1.slice(0,2),
-          records2: results2.slice(0,5),
-          scoreAvg: classData.scoreAvg
-        })
+
+        Promise.all(recordCreatePromise)
+          .then(() => {
+            return res.render('teacher/profile', { 
+              user: user.toJSON(),
+              class: classData.toJSON(),
+              records: results1.slice(0,2),
+              records2: results2.slice(0,5),
+              scoreAvg: classData.scoreAvg
+            })          
+          })
       })
       .catch(err => next(err))
   },
