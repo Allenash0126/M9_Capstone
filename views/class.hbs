@@ -6,25 +6,36 @@
           style="width:250px; margin-bottom: 25px; transition: opacity 0.5s; opacity:0;" onload="this.style.opacity=1">
       </div>
 
-      <div id="not_image">
+      <div id="not_image" class="card mb-4 shadow-sm">
         <h3>{{ class.teacherName }}</h3>
         <p>Nation: {{ class.nation }} </p>
-        <p>Score: {{ class.scoreAvg }}</p> 
+        <p>Average Score: {{ class.scoreAvg }}</p> 
       </div>
     </div>
 
     <div id="left_bottom">
-      <h6>Introduction</h6>
-      <p>{{ class.intro }}</p>
+      <div class="card mb-4 shadow-sm">
+        <h5>Introduction</h5>
+        <p>{{ class.intro }}</p>
+      </div>
       
-      <h6>Teaching Style</h6>
-      <p>{{ class.style }}</p>
+      <div class="card mb-4 shadow-sm">
+        <h5>Teaching Style</h5>
+        <p>{{ class.style }}</p>
+      </div>
 
-      <h6>Lesson History</h6>
-      {{#each records}}
-        {{ this.score }}
-        <p>{{ this.comment }}</p>
-      {{/each}}
+      <div class="card mb-4 shadow-sm">
+        <h5>Lesson History</h5>
+      
+        {{#each history}}
+          <div class="col">
+            score: {{ this.score }}
+          </div>
+          <div class="col">
+            <p>{{ this.comment }}</p>
+          </div>
+        {{/each}}
+      </div>
     </div>
   </div>
 

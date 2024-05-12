@@ -9,7 +9,7 @@ const classController = {
     // 問號的好處：如果 req.query.keyword 為 null 或 undefined，則整個表達式將返回 undefined，而不會引發錯誤。這樣可以防止出現 Cannot read property 'trim' of null 或 Cannot read property 'trim' of undefined 的錯誤。
     const keywords = req.query.keywords?.trim() 
 
-    const DEFAULT_LIMIT = 5
+    const DEFAULT_LIMIT = 6
     const page = Number(req.query.page) || 1
     const limit = Number(req.query.limit) || DEFAULT_LIMIT
     const offset = getOffset(limit, page)
@@ -43,8 +43,8 @@ const classController = {
         records2.forEach(record2 => {
           const [dateString, dayOfWeek] = record2.date.split(' ')
           const dateObj = dayjs(dateString)
-          // if (dateObj.isBefore(currentDate)) { // 拿出學生過去已上課過的課程
-            if (dateObj.isAfter(currentDate)) { // 拿出學生未來已預約的課程
+          if (dateObj.isBefore(currentDate)) { // 拿出學生過去已上課過的課程
+            // if (dateObj.isAfter(currentDate)) { // 拿出學生未來已預約的課程
             totalRecordsFinishedClass.push(record2)
           } 
         })   
@@ -241,8 +241,11 @@ const classController = {
                 ])
               })
               .then(([classData, recordsUpdated]) => {
-                recordsUpdated = recordsUpdated.filter(record => !record.studentId)     
-                res.render('class', { class: classData, records: recordsUpdated }
+                recordsUpdated = recordsUpdated.filter(record => !record.studentId)
+                const history = recordsBnowTaught.map(record => record.toJSON()).filter(record => record.comment)
+                console.log('recordsBnowTaught~~~~~~', recordsBnowTaught)
+                console.log('history~~~~~~', history)                
+                res.render('class', { class: classData, records: recordsUpdated, history }
               )})
               .catch(err => next(err))                 
           })        
