@@ -68,14 +68,19 @@ npm run dev
 http://localhost:3000
 ```
 
-## 共用帳號
-請一律設定下面 2 組帳號以利驗收：
-* 第一組帳號有 admin 權限：
+## 種子資料
+* 身份(1): 學生
+  * email: user1@example.com 
+  * password: 12345678
+  * 數量: 5位 (user1 ~ user5)
+* 身份(2): 老師
+  * email: teacher1@example.com 
+  * password: 12345678
+  * 數量: 10位 (teacher1 ~ teacher10)
+* 身份(3): 管理者
   * email: root@example.com
   * password: 12345678
-* 第二組帳號沒有 admin 權限：
-  * email: user1@example.com
-  * password: 12345678
+  * 數量：1位
 
 ## 開發工具：
 * bcryptjs: 2.4.3
