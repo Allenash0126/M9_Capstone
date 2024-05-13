@@ -33,7 +33,7 @@ module.exports = {
     await queryInterface.bulkInsert('Users',
       Array.from({ length: 10 }, (n, i) => ({
         name: faker.name.findName(),
-        email: faker.internet.email(),
+        email: `teacher${i + 1}@example.com`,
         password: bcrypt.hashSync('12345678', 10),
         intro: faker.lorem.text().slice(0, 20),
         image: `https://loremflickr.com/320/240/cat/?random=${Math.random() * 100}`,

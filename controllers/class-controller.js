@@ -277,8 +277,9 @@ const classController = {
       })
     ])
       .then(([record1, record2]) => {
-        if(!record2) throw new Error('There is no such record')
+        if (!record2) throw new Error('There is no such record')
         if (record2.studentId !== req.user.id) throw new Error('You can comment your teacher only')
+        if(score < 1 || score > 5 ) throw new Error('The score must be between 1 to 5.')
         const { teacherId } = record2.Class
         record1.update({ comment, score })        
         req.flash('success_msg', 'Commented successfully')
