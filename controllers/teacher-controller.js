@@ -43,8 +43,8 @@ const teacherController = {
         if(!classData) throw new Error(`You haven't filled in any info in 成為老師 form`)
         const currentDate = dayjs() // 獲取當前日期
 
-        const recordsAnow = []
-        const recordsBnow = []
+        const recordsAnow = [] // recordsAnow: 表示未來的預約紀錄 records After now
+        const recordsBnow = [] // recordsBnow: 表示過往的上課紀錄 records Before now
         records.forEach(record => {
           const [dateString, dayOfWeek] = record.date.split(' ')
           if (dayjs(dateString).isAfter(currentDate)) {
@@ -58,7 +58,10 @@ const teacherController = {
         const results2 = recordsBnow
 
         // (2) for seeder
-        const recordCreatePromise = [] // 為了確保以下都建立完成後 再統一render, 避免asyn導致未寫入完成就render空物件
+        const recordCreatePromise = [] 
+        // recordCreatePromise 為了確保以下都建立完成後 再統一render, 避免asyn導致未寫入完成就render空物件
+
+
         if (user.nation.includes('seeder')) {
           const newDates = [] 
           let currentDate = dayjs() 
@@ -128,6 +131,7 @@ const teacherController = {
                 classId: classData.id
               }
 
+              // recordCreatePromise 為了確保以上都建立完成後 再統一render, 避免asyn導致未寫入完成就render空物件
               recordCreatePromise.push(              
                 Record.create(recordCreate1),          
                 Record.create(recordCreate2)

@@ -6,7 +6,7 @@ const { getOffset, getPagination } = require('../helpers/pagination-helper');
 const classController = {
   getClasses: (req, res, next) => {
     
-    // 問號的好處：如果 req.query.keyword 為 null 或 undefined，則整個表達式將返回 undefined，而不會引發錯誤。這樣可以防止出現 Cannot read property 'trim' of null 或 Cannot read property 'trim' of undefined 的錯誤。
+    // 串連運算子(問號的好處)：如果 req.query.keyword 為 null 或 undefined，則整個表達式將返回 undefined，而不會引發錯誤。這樣可以防止出現 Cannot read property 'trim' of null 或 Cannot read property 'trim' of undefined 的錯誤。
     const keywords = req.query.keywords?.trim() 
 
     const DEFAULT_LIMIT = 6
@@ -29,7 +29,7 @@ const classController = {
     ])
       .then(([classes, records2]) => {
         const currentDate = dayjs() // 獲取當前日期
-        const recordsBnow = []
+        const recordsBnow = [] // recordsBnow: 表示過往的上課紀錄 records Before now
         records2.forEach(record => {
           const [dateString, dayOfWeek] = record.date.split(' ')
           if (dayjs(dateString).isBefore(currentDate)) {
@@ -242,9 +242,7 @@ const classController = {
               })
               .then(([classData, recordsUpdated]) => {
                 recordsUpdated = recordsUpdated.filter(record => !record.studentId)
-                const history = recordsBnowTaught.map(record => record.toJSON()).filter(record => record.comment)
-                console.log('recordsBnowTaught~~~~~~', recordsBnowTaught)
-                console.log('history~~~~~~', history)                
+                const history = recordsBnowTaught.map(record => record.toJSON()).filter(record => record.comment)             
                 res.render('class', { class: classData, records: recordsUpdated, history }
               )})
               .catch(err => next(err))                 
