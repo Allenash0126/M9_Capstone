@@ -108,7 +108,11 @@ const classController = {
     
     return Class.findByPk(classId, { raw: true, attributes: ['classDay', 'duration30or60', 'teacherId'] })
       .then(classData => {
-        const { classDay, duration30or60, teacherId } = classData
+        const { duration30or60, teacherId } = classData
+        let { classDay } = classData
+        if (typeof classDay === 'string') {
+          classDay = JSON.parse(classDay);
+        }        
         const newDates = [] 
         let currentDate = dayjs() // 獲取當前日期
         for (let i = 0; i < 15; i++) {
@@ -126,7 +130,7 @@ const classController = {
             }
             currentDate = currentDate.add(1, 'day')      
           } else {
-            if (classDay.some(day => parseInt(day) === currentDate.day())) {
+            if (classDay.some(day => parseInt(day) === currentDate.day())) {         
               const formattedDate = currentDate.format('YYYY-MM-DD dddd')
               newDates.push(formattedDate);
             }
@@ -244,10 +248,10 @@ const classController = {
                 recordsUpdated = recordsUpdated.filter(record => !record.studentId)
                 const history = recordsBnowTaught.map(record => record.toJSON()).filter(record => record.comment)             
                 res.render('class', { class: classData, records: recordsUpdated, history }
-              )})
-              .catch(err => next(err))                 
+              )})        
           })        
       })
+      .catch(err => next(err))     
   },  
   getComment: (req, res, next) => {
     const { id } = req.params

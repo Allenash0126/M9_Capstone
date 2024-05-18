@@ -379,8 +379,14 @@ const seeder = [seedAmin, ...seedStudent, ...seedTeacher]
 // console.log('magicNumber~~', magicNumber)
 // console.log('randomB~~', randomB)
 
-const cht = 1
-if (cht) {
-  return console.log('it is 1 ')
-} 
-console.log('it is 2 ')
+// const cht = 1
+// if (cht) {
+//   return console.log('it is 1 ')
+// } 
+// console.log('it is 2 ')
+
+const cdate = 3
+const classDay = ["5","3"]
+if (classDay.some(day => parseInt(day) === cdate)) {
+  console.log('true')
+}

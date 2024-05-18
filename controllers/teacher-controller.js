@@ -65,17 +65,32 @@ const teacherController = {
         if (user.nation.includes('seeder')) {
           const newDates = [] 
           let currentDate = dayjs() 
+          let { classDay } = classData
+          if (typeof classDay === 'string') {
+            classDay = JSON.parse(classDay);
+          }
+
           for (let i = 0; i < 15; i++) {
             // 商業邏輯：定義 當日不能被預約, 故跳過今天符合user選擇的星期幾
-            if (i === 0) { 
+            if (i === 0) { // 1個等號用於賦值, 3個等號用於條件比較
               currentDate = currentDate.add(1, 'day')
               continue
             }
-            if (classData.classDay.some(day => parseInt(day) === currentDate.day())) {
-              const formattedDate = currentDate.format('YYYY-MM-DD dddd')
-              newDates.push(formattedDate);
+            // 判定：先確認是否老師每週只選一天課程 不論是否後續動作都一樣, 只差在判斷式
+            // 因為：若只選一天課程就非 array, 而是string, 但 some 只能用於array（多天課程）
+            if (classDay.length < 2) {
+              if (parseInt(classDay) === currentDate.day()) {
+                const formattedDate = currentDate.format('YYYY-MM-DD dddd')
+                newDates.push(formattedDate);
+              }
+              currentDate = currentDate.add(1, 'day')      
+            } else {
+              if (classDay.some(day => parseInt(day) === currentDate.day())) {         
+                const formattedDate = currentDate.format('YYYY-MM-DD dddd')
+                newDates.push(formattedDate);
+              }
+              currentDate = currentDate.add(1, 'day')            
             }
-            currentDate = currentDate.add(1, 'day')
           }
           currentDate = dayjs() // 把 currentDate 調整回今天的日期
 

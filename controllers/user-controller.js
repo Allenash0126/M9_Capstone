@@ -50,12 +50,27 @@ const userController = {
     // 老師可以上課的所有日期 dates
     const dates = [] 
     let currentDate = dayjs() // 獲取當前日期
-    for (let i = 0; i < 14; i++) {
-      if (classDay.some(day => parseInt(day) === currentDate.day())) {
-        const formattedDate = currentDate.format('YYYY-MM-DD dddd')
-        dates.push(formattedDate);
+    for (let i = 0; i < 15; i++) {
+      // 商業邏輯：定義 當日不能被預約, 故跳過今天符合user選擇的星期幾
+      if (i === 0) { // 1個等號用於賦值, 3個等號用於條件比較
+        currentDate = currentDate.add(1, 'day')
+        continue
       }
-      currentDate = currentDate.add(1, 'day')
+      // 判定：先確認是否老師每週只選一天課程 不論是否後續動作都一樣, 只差在判斷式
+      // 因為：若只選一天課程就非 array, 而是string, 但 some 只能用於array（多天課程）
+      if (classDay.length < 2) {
+        if (parseInt(classDay) === currentDate.day()) {
+          const formattedDate = currentDate.format('YYYY-MM-DD dddd')
+          dates.push(formattedDate);
+        }
+        currentDate = currentDate.add(1, 'day')      
+      } else {
+        if (classDay.some(day => parseInt(day) === currentDate.day())) {         
+          const formattedDate = currentDate.format('YYYY-MM-DD dddd')
+          dates.push(formattedDate);
+        }
+        currentDate = currentDate.add(1, 'day')            
+      }
     }  
 
     return Promise.all([
