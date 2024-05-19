@@ -3,6 +3,7 @@ const dayjs = require('dayjs');
 const { User, Class, List, Record } = require('../models')
 const { localFileHandler } = require('../helpers/file-helpers')
 const { recordCreator } = require('../helpers/record-helpers')
+const { newDatesCreator } = require('../helpers/record-helpers')
 const Sequelize = require('sequelize');
 
 const userController = {
@@ -44,73 +45,58 @@ const userController = {
   },
   signUpTeacher: (req, res, next) => {   
     const teacherId = req.user.id
-    const { intro, style, link, classDay, duration30or60, nation } = req.body
+    const { intro, style, link, duration30or60, nation } = req.body
+    let { classDay } = req.body // 因為 classDay 是JSON檔, 在newDatesCreator將更換格式 所以這裡要用let, 不能用const
     const { file } = req
-
-    // 老師可以上課的所有日期 dates
-    const dates = [] 
-    let currentDate = dayjs() // 獲取當前日期
-    for (let i = 0; i < 15; i++) {
-      // 商業邏輯：定義 當日不能被預約, 故跳過今天符合user選擇的星期幾
-      if (i === 0) { // 1個等號用於賦值, 3個等號用於條件比較
-        currentDate = currentDate.add(1, 'day')
-        continue
-      }
-      // 判定：先確認是否老師每週只選一天課程 不論是否後續動作都一樣, 只差在判斷式
-      // 因為：若只選一天課程就非 array, 而是string, 但 some 只能用於array（多天課程）
-      if (classDay.length < 2) {
-        if (parseInt(classDay) === currentDate.day()) {
-          const formattedDate = currentDate.format('YYYY-MM-DD dddd')
-          dates.push(formattedDate);
-        }
-        currentDate = currentDate.add(1, 'day')      
-      } else {
-        if (classDay.some(day => parseInt(day) === currentDate.day())) {         
-          const formattedDate = currentDate.format('YYYY-MM-DD dddd')
-          dates.push(formattedDate);
-        }
-        currentDate = currentDate.add(1, 'day')            
-      }
-    }  
+    const dates = newDatesCreator(classDay) // 老師可以上課的所有日期 dates
 
     return Promise.all([
       User.findByPk(teacherId),
       Class.findOne({ where: { teacherId } }),
       localFileHandler(file),
       List.findAll({ where: { duration30or60 }, raw: true }),
-      Class.findAll({ raw: true })
     ])
-      .then(([user, classData, filePath, lists, classesDatas]) => {
+      .then(([user, classData, filePath, lists]) => {
         if(!user) throw new Error('There is no such user :(')
         if(classData) throw new Error('You have been already a teacher')
         const classNumberInOneDay = lists.length // 每天可約的時段數量有幾個
         
-        user.update({ 
+        return user.update({ 
           isTeacher: 1,
           image: filePath || null, 
           intro,
           nation
-        })        
-        Class.create({ 
-          intro, style, link, classDay, teacherId, duration30or60, nation,
-          teacherName: user.toJSON().name,
-          image: filePath || null
         })
-
-        // recordCreator(req)
-        for (let i = 0; i < dates.length; i++ ) {
-          for (let j = 0; j < classNumberInOneDay; j++ ) {
-            let chosenOclock = lists.filter(list => list.oclock === lists[j].oclock)
-            let timeListId = chosenOclock[0].id            
-            Record.create({
-              teacherId,
-              timeListId,
-              date: dates[i],
-              oclock: lists[j].oclock,
-              classId: classesDatas.length + 1
-            })
+        .then(() => {
+          return Class.create({ 
+            intro, style, link, classDay, teacherId, duration30or60, nation,
+            teacherName: user.toJSON().name,
+            image: filePath || null
+          })          
+        })
+        .then((classCreated) => {
+          const classId = classCreated.id
+          // recordPromises ＋ Promise.all: 是處理多個非同步操作的最佳實踐
+          // (1) 確保所有的 Record.create 完成後才進行下一步
+          // (2) 錯誤處理更容易: 若任一個 Record.create 操作失敗，Promise.all 會立即拒絕並進入 .catch 區塊
+          const recordPromises = [] 
+          for (let i = 0; i < dates.length; i++ ) {
+            for (let j = 0; j < classNumberInOneDay; j++ ) {
+              let chosenOclock = lists.filter(list => list.oclock === lists[j].oclock)
+              let timeListId = chosenOclock[0].id
+              recordPromises.push(
+                Record.create({
+                  teacherId,
+                  timeListId,
+                  date: dates[i],
+                  oclock: lists[j].oclock,
+                  classId
+                })                
+              )
+            }
           }
-        }   
+          return Promise.all(recordPromises)
+        })
       })
       .then(() => {
         req.flash('success_msg', '歡迎成為老師！')

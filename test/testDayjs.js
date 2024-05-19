@@ -1,5 +1,5 @@
 const dayjs = require('dayjs');
-const { User } = require('./models')
+const { User } = require('../models')
 const Sequelize = require('sequelize')
 
 // // 獲取當前日期

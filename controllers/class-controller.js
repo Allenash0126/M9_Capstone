@@ -2,6 +2,7 @@ const { Class, User, Record, List } = require('../models')
 const dayjs = require('dayjs');
 const Sequelize = require('sequelize')
 const { getOffset, getPagination } = require('../helpers/pagination-helper');
+const { newDatesCreator } = require('../helpers/record-helpers')
 
 const classController = {
   getClasses: (req, res, next) => {
@@ -109,35 +110,9 @@ const classController = {
     return Class.findByPk(classId, { raw: true, attributes: ['classDay', 'duration30or60', 'teacherId'] })
       .then(classData => {
         const { duration30or60, teacherId } = classData
-        let { classDay } = classData
-        if (typeof classDay === 'string') {
-          classDay = JSON.parse(classDay);
-        }        
-        const newDates = [] 
-        let currentDate = dayjs() // 獲取當前日期
-        for (let i = 0; i < 15; i++) {
-          // 商業邏輯：定義 當日不能被預約, 故跳過今天符合user選擇的星期幾
-          if (i === 0) { // 1個等號用於賦值, 3個等號用於條件比較
-            currentDate = currentDate.add(1, 'day')
-            continue
-          }
-          // 判定：先確認是否老師每週只選一天課程 不論是否後續動作都一樣, 只差在判斷式
-          // 因為：若只選一天課程就非 array, 而是string, 但 some 只能用於array（多天課程）
-          if (classDay.length < 2) {
-            if (parseInt(classDay) === currentDate.day()) {
-              const formattedDate = currentDate.format('YYYY-MM-DD dddd')
-              newDates.push(formattedDate);
-            }
-            currentDate = currentDate.add(1, 'day')      
-          } else {
-            if (classDay.some(day => parseInt(day) === currentDate.day())) {         
-              const formattedDate = currentDate.format('YYYY-MM-DD dddd')
-              newDates.push(formattedDate);
-            }
-            currentDate = currentDate.add(1, 'day')            
-          }
-        }  
-        currentDate = dayjs() // 把 currentDate 調整回今天的日期       
+        let { classDay } = classData // 因 classDay是 JSON檔, 在 newDatesCreator將更換格式 所以這裡要用let, 不能用const
+        const newDates = newDatesCreator(classDay)
+        let currentDate = dayjs()     
 
         return Promise.all([
           List.findAll({ where: { duration30or60 }, raw: true }), // for Group Create
