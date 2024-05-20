@@ -3,7 +3,7 @@
 <img width="1324" alt="SignInPage" src="https://github.com/Allenash0126/M9_Capstone/assets/150648641/a5a65e71-0928-4f4f-b470-dc03d90a66c2">
 
 ## 首頁
-![HomePage](https://github.com/Allenash0126/M9_Capstone/assets/150648641/3dc09fa1-51bf-4097-8f0d-3b27d652f7fe)
+<img width="1012" alt="homepage0520 1" src="https://github.com/Allenash0126/M9_Capstone/assets/150648641/14a29d03-4cc7-41c3-bc28-7bf574c89a19">
 
 ## 簡介
 * 這是一個英文家教媒合平台
