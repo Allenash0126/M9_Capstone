@@ -45,7 +45,7 @@ const adminController = {
       })
       .then(() => {
         req.flash('success_msg', '新增成功！')
-        return res.redirect('/admin')
+        return res.redirect('/admin/timelists')
       })
       .catch(err => next(err))
   },
@@ -61,7 +61,7 @@ const adminController = {
       })
       .then(() => {
         req.flash('success_msg', '更新成功！')
-        return res.redirect('/admin')
+        return res.redirect('/admin/timelists')
       })
       .catch(err => next(err))
   },

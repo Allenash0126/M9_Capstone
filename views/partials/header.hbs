@@ -10,14 +10,17 @@
         
         <div class="collapse navbar-collapse" id="navbarCollapse">
           <ul class="navbar-nav ms-auto mb-2 mb-md-0">
-            {{#unless user.isTeacher }} {{!--  使用unless, 效果：當unless後面為false，才會執行 --}}
-              <li class="nav-item d-inline-flex align-items-center">
-                <a href="/users/{{ user.id }}/profile" class="nav-link">{{ user.name }}</a>
-              </li>
-
-              <li class="nav-item">
-                <a href="/signup/forteacher" class="nav-link">成為老師</a>
-              </li>
+            {{!-- (內建功能) 使用unless, 效果：當unless後面為false，才會執行 --}}
+            {{#unless user.isTeacher }} 
+                <li class="nav-item d-inline-flex align-items-center">
+                  <a href="/users/{{ user.id }}/profile" class="nav-link">{{ user.name }}</a>
+                </li>
+              {{!-- (新增功能 in handlebars-helper) 使用unlessCond, 效果：當後2者不同，才會執行; for 管理者 不要出現成為老師--}}
+              {{#unlessCond user.email 'root@example.com'}} 
+                <li class="nav-item">
+                  <a href="/signup/forteacher" class="nav-link">成為老師</a>
+                </li>
+              {{/unlessCond}}
             {{/unless}}
 
             {{#if user.isTeacher}}

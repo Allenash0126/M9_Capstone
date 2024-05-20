@@ -154,54 +154,58 @@ const classController = {
   postComment: (req, res, next) => {
     const { comment, score } = req.body
     const { id } = req.params
-    return Promise.all([
-      Record.findByPk(id),
-      Record.findByPk(id, { 
+    return Record.findByPk(id, { 
         include: [Class],
-        raw: true,
         nest: true
       })
-    ])
-      .then(([record1, record2]) => {
-        if (!record2) throw new Error('There is no such record')
-        if (record2.studentId !== req.user.id) throw new Error('You can comment your teacher only')
+      .then(record => {  
+        if (!record) throw new Error('There is no such record')
+        if (record.studentId !== req.user.id) throw new Error('You can comment your teacher only')
         if(score < 1 || score > 5 ) throw new Error('The score must be between 1 to 5.')
-        const { teacherId } = record2.Class
-        record1.update({ comment, score })        
-        req.flash('success_msg', 'Commented successfully')
+        const { teacherId } = record.Class
+        return record.update({ comment, score })
 
-        // 以下 for 計算scoreAvg 並存入
-        return Promise.all([
-          Record.findByPk(id),
-          Record.findAll({ 
-            where: { 
-              teacherId,
-              studentId: { [Sequelize.Op.not]: null }
-            },
-            include: [Class]
-          })          
-        ])
-      })
-      .then(([record1, records]) => {
-        const currentDate = dayjs() // 獲取當前日期
-        const recordsBnow = []
-        records.forEach(record => {
-          const [dateString, dayOfWeek] = record.date.split(' ')
-          if (dayjs(dateString).isBefore(currentDate)) {
-            recordsBnow.push(record)
-          } 
+        // 以下 for 計算scoreAvg 並存入        
+        .then(() => {
+          req.flash('success_msg', 'Commented successfully')
+          return Promise.all([
+            Record.findByPk(id),
+            Record.findAll({ 
+              where: { 
+                teacherId,
+                studentId: { [Sequelize.Op.not]: null }
+              },
+              include: [Class]
+            })          
+          ])  
         })
-        const results2 = recordsBnow.filter(record => record.score)
-        const scoreArr = results2.map(result2 => result2.score)
-        let scoreTotal = 0
-        for (i = 0; i < scoreArr.length; i++) {
-          scoreTotal += scoreArr[i]
-        }
-        const scoreAvg = scoreTotal/scoreArr.length
-        results2[0].Class.update({ scoreAvg })
-        return res.redirect(`/users/${record1.studentId}/profile`)        
-      })
+        .then(([record1, records]) => {
+          const currentDate = dayjs() // 獲取當前日期
+          const recordsBnow = []
+          records.forEach(record => {
+            const [dateString, dayOfWeek] = record.date.split(' ')
+            if (dayjs(dateString).isBefore(currentDate)) {
+              recordsBnow.push(record)
+            } 
+          })
+          const results2 = recordsBnow.filter(record => record.score)
+          const scoreArr = results2.map(result2 => result2.score)
+          let scoreTotal = 0
+          for (i = 0; i < scoreArr.length; i++) {
+            scoreTotal += scoreArr[i]
+          }
+          // 四捨五入到小數點下第一位
+          const scoreAvg = Math.round(scoreTotal/scoreArr.length * 10) / 10
 
+          if (!results2.length) { // for 首次評分：避免 results2 空集合, 後面接Class出錯
+            records[0].Class.update({ scoreAvg: score })
+          } else {               // for 非首次評分
+            results2[0].Class.update({ scoreAvg })
+          }
+          
+          return res.redirect(`/users/${record1.studentId}/profile`)        
+        })  
+      })
       .catch(err => next(err))
   },
   postRecord: (req, res, next) => {
